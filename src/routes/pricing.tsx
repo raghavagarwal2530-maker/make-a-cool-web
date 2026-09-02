@@ -81,6 +81,16 @@ function Pricing() {
           </div>
         ))}
       </div>
+
+      <div className="mt-12 rounded-2xl border border-border bg-card/50 p-6 sm:p-8">
+        <h2 className="text-lg font-semibold text-foreground">How the 5% works</h2>
+        <p className="mt-3 text-muted-foreground">
+          When a gig is completed, WorkWave keeps only a <strong className="text-foreground">5% commission</strong>. The remaining <strong className="text-foreground">95% goes straight to the doer</strong>.
+        </p>
+        <p className="mt-3 text-muted-foreground">
+          There are no monthly subscriptions, no posting fees, and no hidden charges. If a gig pays ₹1,000, the doer receives ₹950 and WorkWave receives ₹50. Simple as that.
+        </p>
+      </div>
     </div>
   );
 }
