@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/get-started")({
@@ -85,8 +85,9 @@ function GetStarted() {
       email: email.trim(),
       options: {
         shouldCreateUser: true,
-        emailRedirectTo:
-          typeof window !== "undefined" ? `${window.location.origin}/get-started` : undefined,
+        ...(typeof window !== "undefined"
+          ? { emailRedirectTo: `${window.location.origin}/get-started` }
+          : {}),
       },
     });
     setBusy(false);
