@@ -9,13 +9,34 @@ const links = [
 
 export function SiteHeader() {
   return (
-    <header className="sticky top-0 z-50 border-b border-border bg-background/90 backdrop-blur">
+    <header className="sticky top-0 z-50 border-b border-border bg-background/60 backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-5">
-        <Link to="/" className="flex items-center gap-2">
-          <span className="grid size-8 place-items-center rounded-lg bg-primary text-sm font-bold text-primary-foreground">
-            W
+        <Link to="/" className="group flex items-center gap-3">
+          <span className="grid size-9 place-items-center rounded-xl bg-gradient-to-br from-primary to-accent shadow-[0_8px_24px_-8px_oklch(0.62_0.22_305/0.9)]">
+            <svg viewBox="0 0 24 24" className="size-5 text-primary-foreground" fill="none">
+              <path
+                d="M2 15c3-5 5 5 8 0s5 5 8 0"
+                stroke="currentColor"
+                strokeWidth="2.4"
+                strokeLinecap="round"
+              />
+              <path
+                d="M2 9c3-5 5 5 8 0s5 5 8 0"
+                stroke="currentColor"
+                strokeWidth="2.4"
+                strokeLinecap="round"
+                opacity="0.55"
+              />
+            </svg>
           </span>
-          <span className="text-base font-bold tracking-tight text-foreground">WorkWave</span>
+          <span className="leading-none">
+            <span className="block bg-gradient-to-r from-foreground via-foreground to-accent bg-clip-text text-lg font-extrabold tracking-tight text-transparent">
+              WorkWave
+            </span>
+            <span className="mt-1 block text-[10px] font-semibold uppercase tracking-[0.28em] text-muted-foreground">
+              by Jobify
+            </span>
+          </span>
         </Link>
 
         <nav className="hidden items-center gap-7 text-sm text-muted-foreground sm:flex">
