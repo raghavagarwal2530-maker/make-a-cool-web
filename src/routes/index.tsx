@@ -47,13 +47,13 @@ function Home() {
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           <Link
-            to="/how-it-works"
+            to="/get-started"
             className="rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
           >
             Find work
           </Link>
           <Link
-            to="/how-it-works"
+            to="/get-started"
             className="rounded-full border border-border bg-background px-6 py-3 text-sm font-semibold text-foreground transition-colors hover:border-primary hover:text-primary"
           >
             Post a gig
