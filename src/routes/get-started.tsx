@@ -55,6 +55,25 @@ function GetStarted() {
 
   const total = 5;
 
+  // If the email link was clicked (it signs you in and comes back here), skip ahead.
+  useEffect(() => {
+    let active = true;
+    supabase.auth.getSession().then(({ data }) => {
+      if (!active || !data.session) return;
+      setEmail((e) => e || data.session!.user.email || "");
+      setStep((s) => (s < 3 ? 3 : s));
+    });
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
+      if (!session) return;
+      setEmail((e) => e || session.user.email || "");
+      setStep((s) => (s < 3 ? 3 : s));
+    });
+    return () => {
+      active = false;
+      sub.subscription.unsubscribe();
+    };
+  }, []);
+
   async function sendCode() {
     setError(null);
     if (!/^\S+@\S+\.\S+$/.test(email.trim())) {
@@ -64,12 +83,17 @@ function GetStarted() {
     setBusy(true);
     const { error: err } = await supabase.auth.signInWithOtp({
       email: email.trim(),
-      options: { shouldCreateUser: true },
+      options: {
+        shouldCreateUser: true,
+        emailRedirectTo:
+          typeof window !== "undefined" ? `${window.location.origin}/get-started` : undefined,
+      },
     });
     setBusy(false);
     if (err) return setError(err.message);
     setStep(2);
   }
+
 
   async function verifyCode() {
     setError(null);
