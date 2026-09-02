@@ -14,7 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      onboarding_profiles: {
+        Row: {
+          age_confirmed: boolean
+          birthdate: string
+          created_at: string
+          email: string
+          id: string
+          id_document_number: string | null
+          id_document_type: string | null
+          phone: string
+          role: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          age_confirmed?: boolean
+          birthdate: string
+          created_at?: string
+          email: string
+          id?: string
+          id_document_number?: string | null
+          id_document_type?: string | null
+          phone: string
+          role: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          age_confirmed?: boolean
+          birthdate?: string
+          created_at?: string
+          email?: string
+          id?: string
+          id_document_number?: string | null
+          id_document_type?: string | null
+          phone?: string
+          role?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
