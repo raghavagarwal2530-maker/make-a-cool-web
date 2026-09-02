@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/get-started")({
@@ -55,6 +55,25 @@ function GetStarted() {
 
   const total = 5;
 
+  // If the email link was clicked (it signs you in and comes back here), skip ahead.
+  useEffect(() => {
+    let active = true;
+    supabase.auth.getSession().then(({ data }) => {
+      if (!active || !data.session) return;
+      setEmail((e) => e || data.session!.user.email || "");
+      setStep((s) => (s < 3 ? 3 : s));
+    });
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
+      if (!session) return;
+      setEmail((e) => e || session.user.email || "");
+      setStep((s) => (s < 3 ? 3 : s));
+    });
+    return () => {
+      active = false;
+      sub.subscription.unsubscribe();
+    };
+  }, []);
+
   async function sendCode() {
     setError(null);
     if (!/^\S+@\S+\.\S+$/.test(email.trim())) {
@@ -64,12 +83,18 @@ function GetStarted() {
     setBusy(true);
     const { error: err } = await supabase.auth.signInWithOtp({
       email: email.trim(),
-      options: { shouldCreateUser: true },
+      options: {
+        shouldCreateUser: true,
+        ...(typeof window !== "undefined"
+          ? { emailRedirectTo: `${window.location.origin}/get-started` }
+          : {}),
+      },
     });
     setBusy(false);
     if (err) return setError(err.message);
     setStep(2);
   }
+
 
   async function verifyCode() {
     setError(null);
@@ -235,7 +260,9 @@ function GetStarted() {
         <div className={`mt-8 ${card}`}>
           <h2 className="text-xl font-bold text-foreground">Enter your one-time passcode</h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            We sent a 6-digit code to <span className="text-foreground">{email}</span>.
+            We emailed <span className="text-foreground">{email}</span>. Either tap the confirm
+            link in that email — this page continues on its own — or type the 6-digit code if your
+            email shows one.
           </p>
           <label className="mt-6 block text-sm font-medium text-foreground">
             6-digit code
