@@ -58,6 +58,23 @@ function GetStarted() {
   // If the email link was clicked (it signs you in and comes back here), skip ahead.
   useEffect(() => {
     let active = true;
+
+    // The confirm link can land here with ?token_hash=...&type=... — finish it.
+    const url = new URL(window.location.href);
+    const tokenHash = url.searchParams.get("token_hash");
+    const linkType = url.searchParams.get("type");
+    if (tokenHash) {
+      supabase.auth
+        .verifyOtp({ token_hash: tokenHash, type: (linkType as "email") || "email" })
+        .then(({ error: err }) => {
+          if (!active) return;
+          if (err) setError("That link expired. Send yourself a new code.");
+          url.searchParams.delete("token_hash");
+          url.searchParams.delete("type");
+          window.history.replaceState({}, "", url.pathname + url.search);
+        });
+    }
+
     supabase.auth.getSession().then(({ data }) => {
       if (!active || !data.session) return;
       setEmail((e) => e || data.session!.user.email || "");
@@ -74,6 +91,14 @@ function GetStarted() {
     };
   }, []);
 
+  // The editor's id-preview host only opens inside Lovable, so email links to it
+  // show "this page can't be reached". Use the stable shareable host instead.
+  function redirectBase() {
+    const { origin, hostname } = window.location;
+    const m = hostname.match(/^id-preview--([0-9a-f-]+)\.lovable\.app$/i);
+    return m ? `https://project--${m[1]}-dev.lovable.app` : origin;
+  }
+
   async function sendCode() {
     setError(null);
     if (!/^\S+@\S+\.\S+$/.test(email.trim())) {
@@ -86,10 +111,11 @@ function GetStarted() {
       options: {
         shouldCreateUser: true,
         ...(typeof window !== "undefined"
-          ? { emailRedirectTo: `${window.location.origin}/get-started` }
+          ? { emailRedirectTo: `${redirectBase()}/get-started` }
           : {}),
       },
     });
+
     setBusy(false);
     if (err) return setError(err.message);
     setStep(2);
