@@ -149,3 +149,22 @@
     color: var(--color-foreground);
   }
 }
+
+@keyframes wave-drift {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@utility animate-wave-slow {
+  animation: wave-drift 26s linear infinite;
+}
+@utility animate-wave-fast {
+  animation: wave-drift 18s linear infinite;
+}
+@utility animate-wave-slower {
+  animation: wave-drift 38s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-wave-slow, .animate-wave-fast, .animate-wave-slower { animation: none; }
+}
