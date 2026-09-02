@@ -3,16 +3,17 @@ import { createFileRoute } from "@tanstack/react-router";
 export const Route = createFileRoute("/pricing")({
   head: () => ({
     meta: [
-      { title: "WorkWave pricing — Free for workers, pay per booking" },
+      { title: "WorkWave pricing — Only 5%, the rest goes to the doer" },
       {
         name: "description",
         content:
-          "Doers join WorkWave free. Companies pay a simple fee only when a gig is completed. No monthly contracts.",
+          "WorkWave takes just 5% per completed gig. The other 95% goes straight to the doer. No monthly fees, no hidden costs.",
       },
       { property: "og:title", content: "WorkWave pricing" },
       {
         property: "og:description",
-        content: "Free for doers. Companies pay only when work gets done.",
+        content:
+          "Only 5% per gig. The rest goes straight to the person doing the work.",
       },
     ],
   }),
@@ -24,14 +25,22 @@ const plans = [
     name: "Doer",
     price: "Free",
     note: "for people looking for work",
-    features: ["Browse every gig", "18+ and phone verification", "No fees on your earnings"],
+    features: [
+      "Browse every gig",
+      "18+ and phone verification",
+      "Keep everything you earn — no deductions",
+    ],
     featured: false,
   },
   {
     name: "Requester",
-    price: "8%",
+    price: "5%",
     note: "per completed gig",
-    features: ["Unlimited gig posts", "One-time, recurring and part-time", "Verified applicants only"],
+    features: [
+      "Unlimited gig posts",
+      "One-time, recurring and part-time",
+      "Verified applicants only",
+    ],
     featured: true,
   },
   {
