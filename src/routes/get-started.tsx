@@ -18,7 +18,7 @@ export const Route = createFileRoute("/get-started")({
       },
     ],
   }),
-  component: GetStarted;
+  component: GetStarted,
 });
 
 type Role = "requester" | "doer";
