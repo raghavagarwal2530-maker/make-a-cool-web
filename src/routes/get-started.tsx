@@ -9,13 +9,15 @@ export const Route = createFileRoute("/get-started")({
       {
         name: "description",
         content:
-          "Choose your side, verify your email with a one-time code, add your phone and birthdate, and start on WorkWave.",
+          "Choose your side, verify your email, add your phone and birthdate, and start on WorkWave.",
       },
       { property: "og:title", content: "Get started on WorkWave" },
       {
         property: "og:description",
-        content: "Post a gig or find work. Email code, phone and 18+ age check in a few steps.",
+        content: "Post a gig or find work. Email, phone and 18+ age check in a few steps.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: GetStarted,
@@ -45,12 +47,12 @@ function GetStarted() {
   const [step, setStep] = useState(0);
   const [role, setRole] = useState<Role | null>(null);
   const [email, setEmail] = useState("");
-  const [code, setCode] = useState("");
   const [phone, setPhone] = useState("");
   const [birthdate, setBirthdate] = useState("");
   const [idType, setIdType] = useState("");
   const [idNumber, setIdNumber] = useState("");
   const [busy, setBusy] = useState(false);
+  const [resendIn, setResendIn] = useState(0);
   const [error, setError] = useState<string | null>(null);
 
   const total = 5;
@@ -58,6 +60,11 @@ function GetStarted() {
   // If the email link was clicked (it signs you in and comes back here), skip ahead.
   useEffect(() => {
     let active = true;
+
+    const savedRole = window.sessionStorage.getItem("workwave-onboarding-role");
+    const savedEmail = window.sessionStorage.getItem("workwave-onboarding-email");
+    if (savedRole === "requester" || savedRole === "doer") setRole(savedRole);
+    if (savedEmail) setEmail(savedEmail);
 
     // The confirm link can land here with ?token_hash=...&type=... — finish it.
     const url = new URL(window.location.href);
@@ -68,7 +75,7 @@ function GetStarted() {
         .verifyOtp({ token_hash: tokenHash, type: (linkType as "email") || "email" })
         .then(({ error: err }) => {
           if (!active) return;
-          if (err) setError("That link expired. Send yourself a new code.");
+          if (err) setError("That verification link has expired. Please send a new email below.");
           url.searchParams.delete("token_hash");
           url.searchParams.delete("type");
           window.history.replaceState({}, "", url.pathname + url.search);
@@ -91,13 +98,11 @@ function GetStarted() {
     };
   }, []);
 
-  // The editor's id-preview host only opens inside Lovable, so email links to it
-  // show "this page can't be reached". Use the stable shareable host instead.
-  function redirectBase() {
-    const { origin, hostname } = window.location;
-    const m = hostname.match(/^id-preview--([0-9a-f-]+)\.lovable\.app$/i);
-    return m ? `https://project--${m[1]}-dev.lovable.app` : origin;
-  }
+  useEffect(() => {
+    if (resendIn <= 0) return;
+    const timer = window.setTimeout(() => setResendIn((value) => value - 1), 1000);
+    return () => window.clearTimeout(timer);
+  }, [resendIn]);
 
   async function sendCode() {
     setError(null);
@@ -111,29 +116,23 @@ function GetStarted() {
       options: {
         shouldCreateUser: true,
         ...(typeof window !== "undefined"
-          ? { emailRedirectTo: `${redirectBase()}/get-started` }
+          ? { emailRedirectTo: `${window.location.origin}/get-started` }
           : {}),
       },
     });
 
     setBusy(false);
-    if (err) return setError(err.message);
+    if (err) {
+      if (err.message.toLowerCase().includes("security purposes")) {
+        setResendIn(60);
+        return setError("A verification email was already sent. Please wait a minute before trying again.");
+      }
+      return setError(err.message);
+    }
+    window.sessionStorage.setItem("workwave-onboarding-email", email.trim());
+    if (role) window.sessionStorage.setItem("workwave-onboarding-role", role);
+    setResendIn(60);
     setStep(2);
-  }
-
-
-  async function verifyCode() {
-    setError(null);
-    if (code.trim().length < 6) return setError("Enter the 6-digit code from your inbox.");
-    setBusy(true);
-    const { error: err } = await supabase.auth.verifyOtp({
-      email: email.trim(),
-      token: code.trim(),
-      type: "email",
-    });
-    setBusy(false);
-    if (err) return setError("That code didn't work. Check it or send a new one.");
-    setStep(3);
   }
 
   async function saveDetails(withId: boolean) {
@@ -256,8 +255,8 @@ function GetStarted() {
         <div className={`mt-8 ${card}`}>
           <h2 className="text-xl font-bold text-foreground">Verify your email</h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            We'll send a one-time passcode to your Gmail (or any email). This is the first half of
-            the 18+ check.
+            We'll send a verification link to your email. Open the message and select “Verify this
+            email” to return to WorkWave and continue automatically.
           </p>
           <label className="mt-6 block text-sm font-medium text-foreground">
             Email address
@@ -272,7 +271,7 @@ function GetStarted() {
           </label>
           <div className="mt-6 flex flex-wrap gap-3">
             <button type="button" disabled={busy} onClick={sendCode} className={primaryBtn}>
-              {busy ? "Sending…" : "Send code"}
+              {busy ? "Sending…" : "Send verification email"}
             </button>
             <button type="button" onClick={() => setStep(0)} className={ghostBtn}>
               Back
@@ -281,31 +280,29 @@ function GetStarted() {
         </div>
       )}
 
-      {/* Step 3 — code */}
+      {/* Step 3 — verification email */}
       {step === 2 && (
         <div className={`mt-8 ${card}`}>
-          <h2 className="text-xl font-bold text-foreground">Enter your one-time passcode</h2>
+          <h2 className="text-xl font-bold text-foreground">Check your email</h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            We emailed <span className="text-foreground">{email}</span>. Either tap the confirm
-            link in that email — this page continues on its own — or type the 6-digit code if your
-            email shows one.
+            A verification message was sent to <span className="font-semibold text-foreground">{email}</span>.
+            Open it and select “Verify this email.” You’ll return to WorkWave and move to the next
+            step automatically.
           </p>
-          <label className="mt-6 block text-sm font-medium text-foreground">
-            6-digit code
-            <input
-              inputMode="numeric"
-              value={code}
-              onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
-              placeholder="123456"
-              className={`${input} tracking-[0.4em]`}
-            />
-          </label>
+          <p className="mt-4 text-sm text-muted-foreground">
+            Can’t find it? Check your spam or junk folder. Keep this page open while you verify.
+          </p>
           <div className="mt-6 flex flex-wrap gap-3">
-            <button type="button" disabled={busy} onClick={verifyCode} className={primaryBtn}>
-              {busy ? "Checking…" : "Verify"}
+            <button
+              type="button"
+              disabled={busy || resendIn > 0}
+              onClick={sendCode}
+              className={primaryBtn}
+            >
+              {busy ? "Sending…" : resendIn > 0 ? `Resend in ${resendIn}s` : "Resend email"}
             </button>
-            <button type="button" disabled={busy} onClick={sendCode} className={ghostBtn}>
-              Resend code
+            <button type="button" onClick={() => setStep(1)} className={ghostBtn}>
+              Use a different email
             </button>
           </div>
         </div>
