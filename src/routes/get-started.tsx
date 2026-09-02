@@ -260,7 +260,9 @@ function GetStarted() {
         <div className={`mt-8 ${card}`}>
           <h2 className="text-xl font-bold text-foreground">Enter your one-time passcode</h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            We sent a 6-digit code to <span className="text-foreground">{email}</span>.
+            We emailed <span className="text-foreground">{email}</span>. Either tap the confirm
+            link in that email — this page continues on its own — or type the 6-digit code if your
+            email shows one.
           </p>
           <label className="mt-6 block text-sm font-medium text-foreground">
             6-digit code
