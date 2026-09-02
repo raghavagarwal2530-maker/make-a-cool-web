@@ -4,40 +4,59 @@ export function WaveBackground() {
       aria-hidden="true"
       className="pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-background"
     >
-      <div className="absolute inset-x-0 top-0 h-[70vh] bg-gradient-to-b from-primary/10 via-primary/5 to-transparent" />
+      {/* deep purple-to-ember base glow */}
+      <div className="absolute inset-0 bg-[radial-gradient(120%_80%_at_15%_0%,oklch(0.42_0.19_305/0.75),transparent_60%),radial-gradient(110%_90%_at_90%_20%,oklch(0.6_0.19_45/0.35),transparent_62%),radial-gradient(120%_90%_at_50%_110%,oklch(0.35_0.16_310/0.8),transparent_65%)]" />
 
+      {/* full-height stacked wave bands */}
       <svg
-        className="absolute inset-x-0 top-[18vh] h-[60vh] w-[220%] animate-wave-slow text-primary/15"
-        viewBox="0 0 1440 320"
+        className="absolute inset-y-0 left-0 h-full w-[220%] animate-wave-slower opacity-70"
+        viewBox="0 0 1440 900"
         preserveAspectRatio="none"
       >
+        <defs>
+          <linearGradient id="wv1" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="oklch(0.55 0.24 305)" stopOpacity="0.55" />
+            <stop offset="100%" stopColor="oklch(0.7 0.2 45)" stopOpacity="0.25" />
+          </linearGradient>
+          <linearGradient id="wv2" x1="1" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="oklch(0.72 0.2 42)" stopOpacity="0.4" />
+            <stop offset="100%" stopColor="oklch(0.45 0.22 300)" stopOpacity="0.35" />
+          </linearGradient>
+          <linearGradient id="wv3" x1="0" y1="1" x2="1" y2="0">
+            <stop offset="0%" stopColor="oklch(0.4 0.2 310)" stopOpacity="0.7" />
+            <stop offset="100%" stopColor="oklch(0.6 0.22 30)" stopOpacity="0.3" />
+          </linearGradient>
+        </defs>
         <path
-          fill="currentColor"
-          d="M0,160 C240,240 480,80 720,140 C960,200 1200,120 1440,170 L1440,320 L0,320 Z"
+          fill="url(#wv1)"
+          d="M0,180 C240,300 480,60 720,180 C960,300 1200,120 1440,220 L1440,420 C1200,320 960,500 720,400 C480,300 240,520 0,400 Z"
         />
       </svg>
 
       <svg
-        className="absolute inset-x-0 top-[30vh] h-[60vh] w-[220%] animate-wave-fast text-primary/10"
-        viewBox="0 0 1440 320"
+        className="absolute inset-y-0 left-0 h-full w-[220%] animate-wave-fast opacity-60"
+        viewBox="0 0 1440 900"
         preserveAspectRatio="none"
       >
         <path
-          fill="currentColor"
-          d="M0,200 C200,120 460,240 720,190 C980,140 1220,230 1440,160 L1440,320 L0,320 Z"
+          fill="url(#wv2)"
+          d="M0,430 C260,540 520,320 780,430 C1020,530 1220,380 1440,470 L1440,700 C1220,600 1020,760 780,660 C520,550 260,780 0,660 Z"
         />
       </svg>
 
       <svg
-        className="absolute inset-x-0 bottom-0 h-[40vh] w-[220%] animate-wave-slower text-primary/[0.07]"
-        viewBox="0 0 1440 320"
+        className="absolute inset-y-0 left-0 h-full w-[220%] animate-wave-slow opacity-70"
+        viewBox="0 0 1440 900"
         preserveAspectRatio="none"
       >
         <path
-          fill="currentColor"
-          d="M0,120 C300,220 600,60 900,140 C1140,205 1300,180 1440,120 L1440,320 L0,320 Z"
+          fill="url(#wv3)"
+          d="M0,700 C300,820 600,600 900,720 C1140,815 1300,700 1440,760 L1440,900 L0,900 Z"
         />
       </svg>
+
+      {/* soften the top so text stays readable */}
+      <div className="absolute inset-0 bg-[linear-gradient(180deg,oklch(0.14_0.05_300/0.55),transparent_35%,oklch(0.13_0.05_300/0.55))]" />
     </div>
   );
 }
