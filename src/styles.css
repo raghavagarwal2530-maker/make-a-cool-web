@@ -4,6 +4,12 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@theme {
+  --font-display: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+}
+
+
 /*
  * Design system definition.
  *
