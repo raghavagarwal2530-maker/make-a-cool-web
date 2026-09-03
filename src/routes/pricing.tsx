@@ -3,17 +3,17 @@ import { createFileRoute } from "@tanstack/react-router";
 export const Route = createFileRoute("/pricing")({
   head: () => ({
     meta: [
-      { title: "WorkWave pricing — Only 5%, the rest goes to the doer" },
+      { title: "WorkWave pricing — Only pay when work gets done" },
       {
         name: "description",
         content:
-          "WorkWave takes just 5% per completed gig. The other 95% goes straight to the doer. No monthly fees, no hidden costs.",
+          "Doers join for free. Requesters pay a 10% fee on small one-time gigs or AED 100 per month for recurring gigs. No hidden costs.",
       },
       { property: "og:title", content: "WorkWave pricing" },
       {
         property: "og:description",
         content:
-          "Only 5% per gig. The rest goes straight to the person doing the work.",
+          "Doers keep what they earn. Requesters pay 10% on small one-time gigs or AED 100/month for recurring gigs.",
       },
     ],
   }),
@@ -29,25 +29,32 @@ const plans = [
       "Browse every gig",
       "18+ and phone verification",
       "Keep everything you earn — no deductions",
+      "Get paid when the job is done",
     ],
     featured: false,
   },
   {
-    name: "Requester",
-    price: "5%",
-    note: "per completed gig",
+    name: "Requester — One-time gig",
+    price: "10%",
+    note: "commission on small one-time gigs",
     features: [
-      "Unlimited gig posts",
-      "One-time, recurring and part-time",
+      "Post single tasks instantly",
       "Verified applicants only",
+      "Only pay when the gig is completed",
+      "Example: AED 200 gig → WorkWave keeps AED 20",
     ],
     featured: true,
   },
   {
-    name: "Company",
-    price: "Custom",
-    note: "for teams hiring at scale",
-    features: ["Volume pricing", "Multiple locations", "Dedicated support"],
+    name: "Requester — Recurring gig",
+    price: "AED 100",
+    note: "per month",
+    features: [
+      "Same shift every week or month",
+      "One flat monthly fee",
+      "No percentage taken from the doer’s pay",
+      "Cancel or change anytime",
+    ],
     featured: false,
   },
 ];
@@ -55,10 +62,15 @@ const plans = [
 function Pricing() {
   return (
     <div className="mx-auto max-w-5xl px-5 py-16">
-      <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">Pricing</h1>
-      <p className="mt-3 max-w-xl text-muted-foreground">
-        Workers never pay. Requesters only pay when the work is actually done.
-      </p>
+      <div className="text-center">
+        <h1 className="text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl">
+          Simple, fair pricing
+        </h1>
+        <p className="mx-auto mt-3 max-w-xl text-muted-foreground">
+          Doers never pay. Requesters only pay when work actually happens — and exactly what the gig
+          type costs.
+        </p>
+      </div>
 
       <div className="mt-10 grid gap-5 sm:grid-cols-3">
         {plans.map((p) => (
@@ -66,31 +78,74 @@ function Pricing() {
             key={p.name}
             className={
               p.featured
-                ? "rounded-xl border-2 border-primary bg-card p-6"
-                : "rounded-xl border border-border bg-card p-6"
+                ? "relative rounded-2xl border-2 border-primary bg-card p-6"
+                : "relative rounded-2xl border border-border bg-card p-6"
             }
           >
-            <h2 className="text-base font-semibold text-foreground">{p.name}</h2>
-            <p className="mt-4 text-3xl font-bold text-foreground">{p.price}</p>
+            {p.featured && (
+              <span className="absolute -top-3 left-6 rounded-full bg-primary px-3 py-0.5 text-[10px] font-bold uppercase tracking-wider text-primary-foreground">
+                Most common
+              </span>
+            )}
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+              {p.name}
+            </h2>
+            <p className="mt-4 text-4xl font-extrabold text-foreground">{p.price}</p>
             <p className="mt-1 text-xs text-muted-foreground">{p.note}</p>
-            <ul className="mt-5 space-y-2 text-sm text-muted-foreground">
+            <ul className="mt-6 space-y-3 text-sm text-muted-foreground">
               {p.features.map((f) => (
-                <li key={f}>· {f}</li>
+                <li key={f} className="flex gap-2">
+                  <span className="text-primary">·</span>
+                  <span>{f}</span>
+                </li>
               ))}
             </ul>
           </div>
         ))}
       </div>
 
-      <div className="mt-12 rounded-2xl border border-border bg-card/50 p-6 sm:p-8">
-        <h2 className="text-lg font-semibold text-foreground">How the 5% works</h2>
-        <p className="mt-3 text-muted-foreground">
-          When a gig is completed, WorkWave keeps only a <strong className="text-foreground">5% commission</strong>. The remaining <strong className="text-foreground">95% goes straight to the doer</strong>.
-        </p>
-        <p className="mt-3 text-muted-foreground">
-          There are no monthly subscriptions, no posting fees, and no hidden charges. If a gig pays AED 1,000, the doer receives AED 950 and WorkWave receives AED 50. Simple as that.
+      {/* Detailed breakdown */}
+      <div className="mt-12 grid gap-5 sm:grid-cols-2">
+        <div className="rounded-2xl border border-border bg-card/50 p-6 sm:p-8">
+          <h2 className="text-lg font-bold text-foreground">One-time gigs</h2>
+          <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+            For small, one-off tasks we take a <strong className="text-foreground">10% commission</strong>.
+            The remaining <strong className="text-foreground">90% goes straight to the doer</strong>.
+          </p>
+          <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+            Example: a one-time gig pays <strong className="text-foreground">AED 200</strong>. The doer
+            receives <strong className="text-foreground">AED 180</strong> and WorkWave receives{" "}
+            <strong className="text-foreground">AED 20</strong>.
+          </p>
+        </div>
+
+        <div className="rounded-2xl border border-border bg-card/50 p-6 sm:p-8">
+          <h2 className="text-lg font-bold text-foreground">Recurring gigs</h2>
+          <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+            For the same shift repeated every week or month, requesters pay a flat fee of{" "}
+            <strong className="text-foreground">AED 100 per month</strong>. No percentage is taken from
+            the doer’s earnings.
+          </p>
+          <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+            Example: a weekly cleaning shift that pays the doer AED 500 each time still costs the
+            requester only AED 100 for the whole month.
+          </p>
+        </div>
+      </div>
+
+      {/* Bottom note */}
+      <div className="mt-8 rounded-2xl border border-primary/30 bg-primary/5 p-6 sm:p-8">
+        <h2 className="text-lg font-bold text-foreground">Part-time jobs & companies</h2>
+        <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+          Larger part-time roles and teams hiring at scale get custom pricing with volume discounts,
+          multiple locations and dedicated support. Contact us through your account to set up a company
+          plan.
         </p>
       </div>
+
+      <p className="mt-8 text-center text-xs text-muted-foreground">
+        No monthly subscriptions for doers. No posting fees. No hidden charges.
+      </p>
     </div>
   );
 }
