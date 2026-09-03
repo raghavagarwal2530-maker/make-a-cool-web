@@ -4,8 +4,8 @@ export function WaveBackground() {
       aria-hidden="true"
       className="pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-background"
     >
-      {/* deep purple-to-ember base glow */}
-      <div className="absolute inset-0 bg-[radial-gradient(120%_80%_at_15%_0%,oklch(0.42_0.19_305/0.75),transparent_60%),radial-gradient(110%_90%_at_90%_20%,oklch(0.6_0.19_45/0.35),transparent_62%),radial-gradient(120%_90%_at_50%_110%,oklch(0.35_0.16_310/0.8),transparent_65%)]" />
+      {/* vibrant orange / sky blue / red base glow */}
+      <div className="absolute inset-0 bg-[radial-gradient(120%_80%_at_12%_0%,oklch(0.72_0.2_45/0.7),transparent_60%),radial-gradient(110%_90%_at_92%_15%,oklch(0.78_0.16_225/0.55),transparent_62%),radial-gradient(120%_90%_at_50%_110%,oklch(0.58_0.24_27/0.6),transparent_65%)]" />
 
       {/* full-height stacked wave bands */}
       <svg
