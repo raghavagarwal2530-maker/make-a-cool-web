@@ -67,8 +67,8 @@ function Pricing() {
           Simple, fair pricing
         </h1>
         <p className="mx-auto mt-3 max-w-xl text-muted-foreground">
-          Doers never pay. Requesters only pay when work actually happens — and exactly what the gig
-          type costs.
+          Doers pay no fees or subscriptions — our commission is taken out of the gig price, so a
+          doer receives the listed pay minus 10%. Companies hiring part-time pay a flat fee instead.
         </p>
       </div>
 
