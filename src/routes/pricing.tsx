@@ -22,38 +22,38 @@ export const Route = createFileRoute("/pricing")({
 
 const plans = [
   {
-    name: "Doer",
-    price: "Free",
-    note: "for people looking for work",
+    name: "One-time gig",
+    price: "10%",
+    note: "commission per gig",
     features: [
-      "Browse every gig",
-      "18+ and phone verification",
-      "Keep everything you earn — no deductions",
-      "Get paid when the job is done",
+      "Post single tasks instantly",
+      "The doer receives 10% less than the price the requester sets",
+      "Example: AED 200 gig → doer gets AED 180, WorkWave keeps AED 20",
+      "Only charged when the gig is completed",
     ],
     featured: false,
   },
   {
-    name: "Requester — One-time gig",
+    name: "Recurring gig",
     price: "10%",
-    note: "commission on small one-time gigs",
+    note: "commission every month",
     features: [
-      "Post single tasks instantly",
-      "Verified applicants only",
-      "Only pay when the gig is completed",
-      "Example: AED 200 gig → WorkWave keeps AED 20",
+      "Same shift every week or month",
+      "10% commission taken every month the gig runs",
+      "The doer receives 10% less than the listed pay",
+      "Cancel or change anytime",
     ],
     featured: true,
   },
   {
-    name: "Requester — Recurring gig",
+    name: "Part-time job (company)",
     price: "AED 100",
-    note: "per month",
+    note: "every 3 months, for one year",
     features: [
-      "Same shift every week or month",
-      "One flat monthly fee",
-      "No percentage taken from the doer’s pay",
-      "Cancel or change anytime",
+      "For real part-time roles posted by companies",
+      "AED 100 charged every 3 months for the first year",
+      "After one year we stop charging completely",
+      "No percentage taken from the employee’s salary",
     ],
     featured: false,
   },
@@ -67,8 +67,8 @@ function Pricing() {
           Simple, fair pricing
         </h1>
         <p className="mx-auto mt-3 max-w-xl text-muted-foreground">
-          Doers never pay. Requesters only pay when work actually happens — and exactly what the gig
-          type costs.
+          Doers pay no fees or subscriptions — our commission is taken out of the gig price, so a
+          doer receives the listed pay minus 10%. Companies hiring part-time pay a flat fee instead.
         </p>
       </div>
 
@@ -122,13 +122,13 @@ function Pricing() {
         <div className="rounded-2xl border border-border bg-card/50 p-6 sm:p-8">
           <h2 className="text-lg font-bold text-foreground">Recurring gigs</h2>
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-            For the same shift repeated every week or month, requesters pay a flat fee of{" "}
-            <strong className="text-foreground">AED 100 per month</strong>. No percentage is taken from
-            the doer’s earnings.
+            For a shift that repeats, we take the same{" "}
+            <strong className="text-foreground">10% commission every month</strong> the gig keeps
+            running. The doer receives 90% of the agreed pay each time.
           </p>
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-            Example: a weekly cleaning shift that pays the doer AED 500 each time still costs the
-            requester only AED 100 for the whole month.
+            Example: a weekly cleaning shift at AED 500 pays the doer{" "}
+            <strong className="text-foreground">AED 450</strong> per shift.
           </p>
         </div>
       </div>
@@ -137,14 +137,16 @@ function Pricing() {
       <div className="mt-8 rounded-2xl border border-primary/30 bg-primary/5 p-6 sm:p-8">
         <h2 className="text-lg font-bold text-foreground">Part-time jobs & companies</h2>
         <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-          Larger part-time roles and teams hiring at scale get custom pricing with volume discounts,
-          multiple locations and dedicated support. Contact us through your account to set up a company
-          plan.
+          When a company hires for a real part-time role, we don’t touch the salary. Instead the
+          company pays <strong className="text-foreground">AED 100 every 3 months</strong> —{" "}
+          <strong className="text-foreground">four payments over one year</strong>. After that year
+          we stop charging for that role entirely.
         </p>
       </div>
 
       <p className="mt-8 text-center text-xs text-muted-foreground">
-        No monthly subscriptions for doers. No posting fees. No hidden charges.
+        No subscriptions for doers and no posting fees — just the commission on gig pay, or the flat
+        company fee for part-time roles.
       </p>
     </div>
   );
