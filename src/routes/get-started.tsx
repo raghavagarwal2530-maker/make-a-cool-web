@@ -107,6 +107,7 @@ function GetStarted() {
       }
 
       try {
+  try {
   if (tokenHash) {
     const verificationType = url.searchParams.get("type");
 
@@ -121,8 +122,11 @@ function GetStarted() {
       type: verificationType,
     });
 
-  const { data, error: err } = await supabase.auth.verifyOtp({
-    token_hash: tokenHash,
+    if (err) {
+      setLinkExpired(true);
+      setStep((s) => (s < 2 ? 2 : s));
+    } else advance(data.user?.email);
+  } else if (authCode) {
     type: verificationType,
   });;
           if (err) {
