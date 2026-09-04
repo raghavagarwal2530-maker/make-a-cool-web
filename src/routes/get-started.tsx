@@ -54,6 +54,8 @@ function GetStarted() {
   const [busy, setBusy] = useState(false);
   const [resendIn, setResendIn] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  const [linkExpired, setLinkExpired] = useState(false);
+  const [code, setCode] = useState("");
 
   const total = 5;
 
@@ -68,13 +70,15 @@ function GetStarted() {
 
     const advance = (userEmail?: string | null) => {
       if (!active) return;
+      setLinkExpired(false);
+      setError(null);
       if (userEmail) setEmail((e) => e || userEmail);
       setStep((s) => (s < 3 ? 3 : s));
     };
 
     const cleanUrl = () => {
       const u = new URL(window.location.href);
-      ["token_hash", "type", "code", "error", "error_description"].forEach((k) =>
+      ["token_hash", "type", "code", "error", "error_code", "error_description"].forEach((k) =>
         u.searchParams.delete(k),
       );
       window.history.replaceState({}, "", u.pathname + u.search);
@@ -84,9 +88,23 @@ function GetStarted() {
       const url = new URL(window.location.href);
       const hash = new URLSearchParams(window.location.hash.replace(/^#/, ""));
       const tokenHash = url.searchParams.get("token_hash");
-      const code = url.searchParams.get("code");
+      const authCode = url.searchParams.get("code");
       const accessToken = hash.get("access_token");
       const refreshToken = hash.get("refresh_token");
+      // Supabase reports a rejected verification in the URL hash (and sometimes query).
+      const callbackError = hash.get("error_code") || hash.get("error") || url.searchParams.get("error_code");
+
+      if (callbackError && !accessToken) {
+        // The one-time link was already used or has expired.
+        if (active) {
+          setLinkExpired(true);
+          setStep((s) => (s < 2 ? 2 : s));
+          setError(null);
+        }
+        window.history.replaceState({}, "", window.location.pathname);
+        cleanUrl();
+        return;
+      }
 
       try {
         if (tokenHash) {
@@ -94,23 +112,29 @@ function GetStarted() {
             token_hash: tokenHash,
             type: ((url.searchParams.get("type") as "email") || "email") as "email",
           });
-          if (err) setError("That verification link has expired. Please send a new email below.");
-          else advance(data.user?.email);
-        } else if (code) {
-          const { data, error: err } = await supabase.auth.exchangeCodeForSession(code);
-          if (err) setError("That verification link has expired. Please send a new email below.");
-          else advance(data.user?.email);
+          if (err) {
+            setLinkExpired(true);
+            setStep((s) => (s < 2 ? 2 : s));
+          } else advance(data.user?.email);
+        } else if (authCode) {
+          const { data, error: err } = await supabase.auth.exchangeCodeForSession(authCode);
+          if (err) {
+            setLinkExpired(true);
+            setStep((s) => (s < 2 ? 2 : s));
+          } else advance(data.user?.email);
         } else if (accessToken && refreshToken) {
           const { data, error: err } = await supabase.auth.setSession({
             access_token: accessToken,
             refresh_token: refreshToken,
           });
-          if (err) setError("That verification link has expired. Please send a new email below.");
-          else advance(data.user?.email);
+          if (err) {
+            setLinkExpired(true);
+            setStep((s) => (s < 2 ? 2 : s));
+          } else advance(data.user?.email);
           window.history.replaceState({}, "", window.location.pathname + window.location.search);
         }
       } finally {
-        if (tokenHash || code) cleanUrl();
+        if (tokenHash || authCode) cleanUrl();
       }
 
       const { data } = await supabase.auth.getSession();
@@ -133,8 +157,28 @@ function GetStarted() {
     return () => window.clearTimeout(timer);
   }, [resendIn]);
 
+  async function verifyCode() {
+    setError(null);
+    const token = code.replace(/\D/g, "");
+    if (token.length !== 6) return setError("Enter the 6-digit code from the email.");
+    setBusy(true);
+    const { data, error: err } = await supabase.auth.verifyOtp({
+      email: email.trim(),
+      token,
+      type: "email",
+    });
+    setBusy(false);
+    if (err) return setError("That code is wrong or has expired. Send a new email and try again.");
+    setLinkExpired(false);
+    setError(null);
+    if (data.user?.email) setEmail((e) => e || data.user!.email!);
+    setStep(3);
+  }
+
   async function sendCode() {
     setError(null);
+    setLinkExpired(false);
+    setCode("");
     if (!/^\S+@\S+\.\S+$/.test(email.trim())) {
       setError("Enter a valid email address.");
       return;
@@ -163,6 +207,7 @@ function GetStarted() {
     setResendIn(60);
     setStep(2);
   }
+
 
   async function saveDetails(withId: boolean) {
     setError(null);
