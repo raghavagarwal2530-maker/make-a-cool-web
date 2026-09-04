@@ -107,14 +107,19 @@ function GetStarted() {
       }
 
       try {
-        if (tokenHash) {
-  const verificationType = url.searchParams.get("type");
+  if (tokenHash) {
+    const verificationType = url.searchParams.get("type");
 
-  if (verificationType !== "email" && verificationType !== "magiclink") {
-    setLinkExpired(true);
-    setStep((s) => (s < 2 ? 2 : s));
-    return;
-  }
+    if (verificationType !== "email" && verificationType !== "magiclink") {
+      setLinkExpired(true);
+      setStep((s) => (s < 2 ? 2 : s));
+      return;
+    }
+
+    const { data, error: err } = await supabase.auth.verifyOtp({
+      token_hash: tokenHash,
+      type: verificationType,
+    });
 
   const { data, error: err } = await supabase.auth.verifyOtp({
     token_hash: tokenHash,
