@@ -357,21 +357,59 @@ function GetStarted() {
       {/* Step 3 — verification email */}
       {step === 2 && (
         <div className={`mt-8 ${card}`}>
-          <h2 className="text-xl font-bold text-foreground">Check your email</h2>
-          <p className="mt-2 text-sm text-muted-foreground">
-            A verification message was sent to <span className="font-semibold text-foreground">{email}</span>.
-            Open it and select “Verify this email.” You’ll return to WorkWave and move to the next
-            step automatically.
-          </p>
-          <p className="mt-4 text-sm text-muted-foreground">
-            Can’t find it? Check your spam or junk folder. Keep this page open while you verify.
-          </p>
+          {linkExpired ? (
+            <>
+              <h2 className="text-xl font-bold text-foreground">That verification link expired</h2>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Verification links can only be opened once and stay valid for a short time — some
+                email apps also open links automatically for security scanning, which uses the link
+                up. Send a fresh email to{" "}
+                <span className="font-semibold text-foreground">{email || "your address"}</span> and
+                open the newest message.
+              </p>
+            </>
+          ) : (
+            <>
+              <h2 className="text-xl font-bold text-foreground">Check your email</h2>
+              <p className="mt-2 text-sm text-muted-foreground">
+                A verification message was sent to{" "}
+                <span className="font-semibold text-foreground">{email}</span>. Open it and select
+                “Verify this email.” You’ll return to WorkWave and move to the next step
+                automatically.
+              </p>
+              <p className="mt-4 text-sm text-muted-foreground">
+                Can’t find it? Check your spam or junk folder. Keep this page open while you verify,
+                and always use the most recent email.
+              </p>
+            </>
+          )}
+
+          <label className="mt-6 block text-sm font-medium text-foreground">
+            Or enter the code from the email (if it shows one)
+            <input
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+              inputMode="numeric"
+              placeholder="123456"
+              maxLength={6}
+              className={input}
+            />
+          </label>
+
           <div className="mt-6 flex flex-wrap gap-3">
+            <button
+              type="button"
+              disabled={busy || code.replace(/\D/g, "").length !== 6}
+              onClick={verifyCode}
+              className={primaryBtn}
+            >
+              {busy ? "Checking…" : "Verify code"}
+            </button>
             <button
               type="button"
               disabled={busy || resendIn > 0}
               onClick={sendCode}
-              className={primaryBtn}
+              className={ghostBtn}
             >
               {busy ? "Sending…" : resendIn > 0 ? `Resend in ${resendIn}s` : "Resend email"}
             </button>
@@ -381,6 +419,7 @@ function GetStarted() {
           </div>
         </div>
       )}
+
 
       {/* Step 4 — phone + birthdate */}
       {step === 3 && (
