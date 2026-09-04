@@ -54,6 +54,8 @@ function GetStarted() {
   const [busy, setBusy] = useState(false);
   const [resendIn, setResendIn] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  const [linkExpired, setLinkExpired] = useState(false);
+  const [code, setCode] = useState("");
 
   const total = 5;
 
@@ -68,13 +70,15 @@ function GetStarted() {
 
     const advance = (userEmail?: string | null) => {
       if (!active) return;
+      setLinkExpired(false);
+      setError(null);
       if (userEmail) setEmail((e) => e || userEmail);
       setStep((s) => (s < 3 ? 3 : s));
     };
 
     const cleanUrl = () => {
       const u = new URL(window.location.href);
-      ["token_hash", "type", "code", "error", "error_description"].forEach((k) =>
+      ["token_hash", "type", "code", "error", "error_code", "error_description"].forEach((k) =>
         u.searchParams.delete(k),
       );
       window.history.replaceState({}, "", u.pathname + u.search);
@@ -84,9 +88,23 @@ function GetStarted() {
       const url = new URL(window.location.href);
       const hash = new URLSearchParams(window.location.hash.replace(/^#/, ""));
       const tokenHash = url.searchParams.get("token_hash");
-      const code = url.searchParams.get("code");
+      const authCode = url.searchParams.get("code");
       const accessToken = hash.get("access_token");
       const refreshToken = hash.get("refresh_token");
+      // Supabase reports a rejected verification in the URL hash (and sometimes query).
+      const callbackError = hash.get("error_code") || hash.get("error") || url.searchParams.get("error_code");
+
+      if (callbackError && !accessToken) {
+        // The one-time link was already used or has expired.
+        if (active) {
+          setLinkExpired(true);
+          setStep((s) => (s < 2 ? 2 : s));
+          setError(null);
+        }
+        window.history.replaceState({}, "", window.location.pathname);
+        cleanUrl();
+        return;
+      }
 
       try {
         if (tokenHash) {
@@ -94,23 +112,29 @@ function GetStarted() {
             token_hash: tokenHash,
             type: ((url.searchParams.get("type") as "email") || "email") as "email",
           });
-          if (err) setError("That verification link has expired. Please send a new email below.");
-          else advance(data.user?.email);
-        } else if (code) {
-          const { data, error: err } = await supabase.auth.exchangeCodeForSession(code);
-          if (err) setError("That verification link has expired. Please send a new email below.");
-          else advance(data.user?.email);
+          if (err) {
+            setLinkExpired(true);
+            setStep((s) => (s < 2 ? 2 : s));
+          } else advance(data.user?.email);
+        } else if (authCode) {
+          const { data, error: err } = await supabase.auth.exchangeCodeForSession(authCode);
+          if (err) {
+            setLinkExpired(true);
+            setStep((s) => (s < 2 ? 2 : s));
+          } else advance(data.user?.email);
         } else if (accessToken && refreshToken) {
           const { data, error: err } = await supabase.auth.setSession({
             access_token: accessToken,
             refresh_token: refreshToken,
           });
-          if (err) setError("That verification link has expired. Please send a new email below.");
-          else advance(data.user?.email);
+          if (err) {
+            setLinkExpired(true);
+            setStep((s) => (s < 2 ? 2 : s));
+          } else advance(data.user?.email);
           window.history.replaceState({}, "", window.location.pathname + window.location.search);
         }
       } finally {
-        if (tokenHash || code) cleanUrl();
+        if (tokenHash || authCode) cleanUrl();
       }
 
       const { data } = await supabase.auth.getSession();
@@ -133,8 +157,28 @@ function GetStarted() {
     return () => window.clearTimeout(timer);
   }, [resendIn]);
 
+  async function verifyCode() {
+    setError(null);
+    const token = code.replace(/\D/g, "");
+    if (token.length !== 6) return setError("Enter the 6-digit code from the email.");
+    setBusy(true);
+    const { data, error: err } = await supabase.auth.verifyOtp({
+      email: email.trim(),
+      token,
+      type: "email",
+    });
+    setBusy(false);
+    if (err) return setError("That code is wrong or has expired. Send a new email and try again.");
+    setLinkExpired(false);
+    setError(null);
+    if (data.user?.email) setEmail((e) => e || data.user!.email!);
+    setStep(3);
+  }
+
   async function sendCode() {
     setError(null);
+    setLinkExpired(false);
+    setCode("");
     if (!/^\S+@\S+\.\S+$/.test(email.trim())) {
       setError("Enter a valid email address.");
       return;
@@ -163,6 +207,7 @@ function GetStarted() {
     setResendIn(60);
     setStep(2);
   }
+
 
   async function saveDetails(withId: boolean) {
     setError(null);
@@ -312,21 +357,59 @@ function GetStarted() {
       {/* Step 3 — verification email */}
       {step === 2 && (
         <div className={`mt-8 ${card}`}>
-          <h2 className="text-xl font-bold text-foreground">Check your email</h2>
-          <p className="mt-2 text-sm text-muted-foreground">
-            A verification message was sent to <span className="font-semibold text-foreground">{email}</span>.
-            Open it and select “Verify this email.” You’ll return to WorkWave and move to the next
-            step automatically.
-          </p>
-          <p className="mt-4 text-sm text-muted-foreground">
-            Can’t find it? Check your spam or junk folder. Keep this page open while you verify.
-          </p>
+          {linkExpired ? (
+            <>
+              <h2 className="text-xl font-bold text-foreground">That verification link expired</h2>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Verification links can only be opened once and stay valid for a short time — some
+                email apps also open links automatically for security scanning, which uses the link
+                up. Send a fresh email to{" "}
+                <span className="font-semibold text-foreground">{email || "your address"}</span> and
+                open the newest message.
+              </p>
+            </>
+          ) : (
+            <>
+              <h2 className="text-xl font-bold text-foreground">Check your email</h2>
+              <p className="mt-2 text-sm text-muted-foreground">
+                A verification message was sent to{" "}
+                <span className="font-semibold text-foreground">{email}</span>. Open it and select
+                “Verify this email.” You’ll return to WorkWave and move to the next step
+                automatically.
+              </p>
+              <p className="mt-4 text-sm text-muted-foreground">
+                Can’t find it? Check your spam or junk folder. Keep this page open while you verify,
+                and always use the most recent email.
+              </p>
+            </>
+          )}
+
+          <label className="mt-6 block text-sm font-medium text-foreground">
+            Or enter the code from the email (if it shows one)
+            <input
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+              inputMode="numeric"
+              placeholder="123456"
+              maxLength={6}
+              className={input}
+            />
+          </label>
+
           <div className="mt-6 flex flex-wrap gap-3">
+            <button
+              type="button"
+              disabled={busy || code.replace(/\D/g, "").length !== 6}
+              onClick={verifyCode}
+              className={primaryBtn}
+            >
+              {busy ? "Checking…" : "Verify code"}
+            </button>
             <button
               type="button"
               disabled={busy || resendIn > 0}
               onClick={sendCode}
-              className={primaryBtn}
+              className={ghostBtn}
             >
               {busy ? "Sending…" : resendIn > 0 ? `Resend in ${resendIn}s` : "Resend email"}
             </button>
@@ -336,6 +419,7 @@ function GetStarted() {
           </div>
         </div>
       )}
+
 
       {/* Step 4 — phone + birthdate */}
       {step === 3 && (
