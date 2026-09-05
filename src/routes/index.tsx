@@ -31,15 +31,17 @@ function Home() {
       <section className="mx-auto max-w-5xl px-5 pb-16 pt-20 text-center">
         <p className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-1.5 backdrop-blur">
           <span className="size-1.5 rounded-full bg-accent" />
-          <span className="bg-gradient-to-r from-primary-foreground to-accent bg-clip-text text-xs font-bold uppercase tracking-[0.32em] text-transparent">
-            WorkWave
-          </span>
+            <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-xs font-bold uppercase tracking-[0.32em] text-transparent">
+              WorkWave
+            </span>
           <span className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
             by Jobify
           </span>
         </p>
-        <h1 className="mx-auto mt-6 max-w-2xl text-4xl font-extrabold leading-[1.05] tracking-tight text-foreground sm:text-6xl">
-          Work that <span className="bg-gradient-to-r from-primary via-accent to-accent bg-clip-text text-transparent">fits your life.</span>
+<h1 className="mx-auto mt-6 max-w-2xl text-4xl font-extrabold leading-[1.05] tracking-tight text-transparent sm:text-6xl">
+          <span className="bg-gradient-to-r from-primary via-accent to-accent bg-clip-text text-transparent">
+            Work that fits your life.
+          </span>
         </h1>
         <p className="mx-auto mt-5 max-w-xl text-base text-muted-foreground sm:text-lg">
           One-time gigs, recurring shifts and part-time jobs — from companies and people nearby.

@@ -30,7 +30,7 @@ export function SiteHeader() {
             </svg>
           </span>
           <span className="leading-none">
-            <span className="block bg-gradient-to-r from-foreground via-foreground to-accent bg-clip-text text-lg font-extrabold tracking-tight text-transparent">
+            <span className="block bg-gradient-to-r from-primary via-accent to-accent bg-clip-text text-lg font-extrabold tracking-tight text-transparent">
               WorkWave
             </span>
             <span className="mt-1 block text-[10px] font-semibold uppercase tracking-[0.28em] text-muted-foreground">
