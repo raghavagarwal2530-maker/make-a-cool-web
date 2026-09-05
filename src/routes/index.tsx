@@ -31,7 +31,7 @@ function Home() {
       <section className="mx-auto max-w-5xl px-5 pb-16 pt-20 text-center">
         <p className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-1.5 backdrop-blur">
           <span className="size-1.5 rounded-full bg-accent" />
-            <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-xs font-bold uppercase tracking-[0.32em] text-transparent">
+            <span className="bg-gradient-to-r from-accent to-primary bg-clip-text text-xs font-bold uppercase tracking-[0.32em] text-transparent">
               WorkWave
             </span>
           <span className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
