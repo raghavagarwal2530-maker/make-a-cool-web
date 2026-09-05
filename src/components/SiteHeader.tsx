@@ -19,13 +19,14 @@ export function SiteHeader() {
             className="size-9 rounded-xl object-cover shadow-[0_8px_24px_-8px_oklch(0.62_0.22_305/0.9)]"
           />
           <span className="leading-none">
-            <span className="block bg-gradient-to-r from-accent via-primary to-primary bg-clip-text text-lg font-extrabold tracking-tight text-transparent">
+            <span className="block whitespace-nowrap bg-gradient-to-r from-accent via-primary to-primary bg-clip-text text-base font-extrabold tracking-[-0.01em] text-transparent sm:text-lg">
               WorkWave
             </span>
-            <span className="mt-1 block text-[10px] font-semibold uppercase tracking-[0.28em] text-muted-foreground">
+            <span className="mt-1 block whitespace-nowrap bg-gradient-to-r from-accent to-primary bg-clip-text text-[9px] font-bold uppercase tracking-[0.18em] text-transparent sm:text-[10px] sm:tracking-[0.24em]">
               by Jobify
             </span>
           </span>
+
         </Link>
 
         <nav className="hidden items-center gap-7 text-sm text-muted-foreground sm:flex">
