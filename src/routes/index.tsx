@@ -29,15 +29,16 @@ function Home() {
   return (
     <div>
       <section className="mx-auto max-w-5xl px-5 pb-16 pt-20 text-center">
-        <p className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-1.5 backdrop-blur">
-          <span className="size-1.5 rounded-full bg-accent" />
-            <span className="bg-gradient-to-r from-accent to-primary bg-clip-text text-xs font-bold uppercase tracking-[0.32em] text-transparent">
-              WorkWave
-            </span>
-          <span className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
+        <p className="inline-flex max-w-full flex-wrap items-center justify-center gap-x-2 gap-y-1 rounded-full border border-border bg-card px-4 py-1.5 backdrop-blur">
+          <span className="size-1.5 shrink-0 rounded-full bg-accent" />
+          <span className="whitespace-nowrap bg-gradient-to-r from-accent to-primary bg-clip-text text-xs font-bold uppercase tracking-[0.22em] text-transparent sm:tracking-[0.3em]">
+            WorkWave
+          </span>
+          <span className="whitespace-nowrap bg-gradient-to-r from-accent to-primary bg-clip-text text-xs font-semibold uppercase tracking-[0.16em] text-transparent">
             by Jobify
           </span>
         </p>
+
 <h1 className="mx-auto mt-6 max-w-2xl text-4xl font-extrabold leading-[1.05] tracking-tight text-transparent sm:text-6xl">
           <span className="bg-gradient-to-r from-primary via-accent to-accent bg-clip-text text-transparent">
             Work that fits your life.
