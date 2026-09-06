@@ -3,6 +3,12 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/get-started")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    role:
+      search.role === "requester" || search.role === "doer"
+        ? search.role
+        : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Get started on WorkWave — Post a gig or find work" },
@@ -53,8 +59,10 @@ function age(birthdate: string) {
 }
 
 function GetStarted() {
-  const [step, setStep] = useState(0);
-  const [role, setRole] = useState<Role | null>(null);
+  const search = Route.useSearch();
+  const directRole = search.role as Role | undefined;
+  const [step, setStep] = useState(directRole ? 1 : 0);
+  const [role, setRole] = useState<Role | null>(directRole ?? null);
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [birthdate, setBirthdate] = useState("");
@@ -72,6 +80,10 @@ function GetStarted() {
   // and returns them to this page.
   useEffect(() => {
     let active = true;
+
+    if (directRole) {
+      window.sessionStorage.setItem("workwave-onboarding-role", directRole);
+    }
 
     const savedRole = window.sessionStorage.getItem(
       "workwave-onboarding-role",
@@ -220,7 +232,7 @@ function GetStarted() {
       active = false;
       sub.subscription.unsubscribe();
     };
-  }, []);
+  }, [directRole]);
 
   useEffect(() => {
     if (resendIn <= 0) return;
@@ -264,7 +276,7 @@ function GetStarted() {
     setError(null);
 
     if (data.user?.email) {
-      setEmail((e) => e || data.user!.email!);
+      setEmail((e) => e || data.user?.email || "");
     }
 
     setStep(3);

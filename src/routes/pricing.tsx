@@ -84,7 +84,7 @@ function Pricing() {
           >
             {p.featured && (
               <span className="absolute -top-3 left-6 rounded-full bg-primary px-3 py-0.5 text-[10px] font-bold uppercase tracking-wider text-primary-foreground">
-                Most common
+                Most popular
               </span>
             )}
             <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
