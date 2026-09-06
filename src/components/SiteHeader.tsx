@@ -18,7 +18,7 @@ export function SiteHeader() {
             alt="WorkWave symbol"
             className="size-10 rounded-lg object-cover shadow-lg"
           />
-          <span className="whitespace-nowrap bg-gradient-to-r from-accent via-accent to-primary bg-clip-text text-sm font-extrabold leading-none text-transparent sm:text-base">
+          <span className="whitespace-nowrap bg-gradient-to-r from-brand-sky via-brand-amber to-brand-orange bg-clip-text text-sm font-extrabold leading-none text-transparent sm:text-base">
             WorkWave by Jobify
           </span>
 
