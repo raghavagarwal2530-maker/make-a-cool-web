@@ -3,12 +3,10 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/get-started")({
-  validateSearch: (search: Record<string, unknown>) => ({
-    role:
-      search.role === "requester" || search.role === "doer"
-        ? search.role
-        : undefined,
-  }),
+  validateSearch: (search: Record<string, unknown>): { role?: Role } => {
+    const role = search["role"];
+    return role === "requester" || role === "doer" ? { role } : {};
+  },
   head: () => ({
     meta: [
       { title: "Get started on WorkWave — Post a gig or find work" },
@@ -60,7 +58,7 @@ function age(birthdate: string) {
 
 function GetStarted() {
   const search = Route.useSearch();
-  const directRole = search.role as Role | undefined;
+  const directRole = search.role;
   const [step, setStep] = useState(directRole ? 1 : 0);
   const [role, setRole] = useState<Role | null>(directRole ?? null);
   const [email, setEmail] = useState("");
