@@ -31,16 +31,13 @@ function Home() {
       <section className="mx-auto max-w-5xl px-5 pb-16 pt-20 text-center">
         <p className="inline-flex max-w-full flex-wrap items-center justify-center gap-x-2 gap-y-1 rounded-full border border-border bg-card px-4 py-1.5 backdrop-blur">
           <span className="size-1.5 shrink-0 rounded-full bg-accent" />
-          <span className="whitespace-nowrap bg-gradient-to-r from-accent to-primary bg-clip-text text-xs font-bold uppercase tracking-[0.22em] text-transparent sm:tracking-[0.3em]">
-            WorkWave
-          </span>
-          <span className="whitespace-nowrap bg-gradient-to-r from-accent to-primary bg-clip-text text-xs font-semibold uppercase tracking-[0.16em] text-transparent">
-            by Jobify
+          <span className="whitespace-nowrap bg-gradient-to-r from-accent via-accent to-primary bg-clip-text text-xs font-bold uppercase tracking-[0.16em] text-transparent sm:tracking-[0.22em]">
+            WorkWave by Jobify
           </span>
         </p>
 
-<h1 className="mx-auto mt-6 max-w-2xl text-4xl font-extrabold leading-[1.05] tracking-tight text-transparent sm:text-6xl">
-          <span className="bg-gradient-to-r from-primary via-accent to-accent bg-clip-text text-transparent">
+        <h1 className="mx-auto mt-6 max-w-2xl text-4xl font-extrabold leading-[1.05] tracking-tight text-transparent sm:text-6xl">
+          <span className="bg-gradient-to-r from-primary from-0% via-primary via-45% to-accent to-70% bg-clip-text text-transparent">
             Work that fits your life.
           </span>
         </h1>
@@ -51,12 +48,14 @@ function Home() {
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           <Link
             to="/get-started"
+            search={{ role: "doer" }}
             className="rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
           >
             Find work
           </Link>
           <Link
             to="/get-started"
+            search={{ role: "requester" }}
             className="rounded-full border border-border bg-background px-6 py-3 text-sm font-semibold text-foreground transition-colors hover:border-primary hover:text-primary"
           >
             Post a gig

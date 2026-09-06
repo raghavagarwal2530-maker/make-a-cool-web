@@ -18,13 +18,8 @@ export function SiteHeader() {
             alt="WorkWave symbol"
             className="size-10 rounded-lg object-cover shadow-lg"
           />
-          <span className="bg-gradient-to-r from-accent to-primary bg-clip-text leading-none text-transparent">
-            <span className="block whitespace-nowrap text-base font-extrabold sm:text-lg">
-              WorkWave
-            </span>
-            <span className="mt-1 block whitespace-nowrap text-[9px] font-bold uppercase tracking-[0.18em] sm:text-[10px] sm:tracking-[0.24em]">
-              by Jobify
-            </span>
+          <span className="whitespace-nowrap bg-gradient-to-r from-accent via-accent to-primary bg-clip-text text-sm font-extrabold leading-none text-transparent sm:text-base">
+            WorkWave by Jobify
           </span>
 
         </Link>
@@ -45,6 +40,7 @@ export function SiteHeader() {
 
         <Link
           to="/get-started"
+          search={{}}
           className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
         >
           Get started
