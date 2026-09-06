@@ -123,6 +123,7 @@ function About() {
         <p className="mt-1 text-sm text-muted-foreground">Join WorkWave today and see how simple everyday work can be.</p>
         <Link
           to="/get-started"
+          search={{}}
           className="mt-5 inline-flex rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
         >
           Get started
