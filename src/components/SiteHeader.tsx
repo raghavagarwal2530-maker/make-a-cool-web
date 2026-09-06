@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import logoAsset from "../assets/workwave-logo.png.asset.json";
+import workwaveSymbol from "../assets/workwave-symbol.png";
 
 const links = [
   { to: "/", label: "Home" },
@@ -14,15 +14,15 @@ export function SiteHeader() {
       <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-5">
         <Link to="/" className="group flex items-center gap-3">
           <img
-            src={logoAsset.url}
-            alt="WorkWave"
-            className="size-9 rounded-xl object-cover shadow-[0_8px_24px_-8px_oklch(0.62_0.22_305/0.9)]"
+            src={workwaveSymbol}
+            alt="WorkWave symbol"
+            className="size-10 rounded-lg object-cover shadow-lg"
           />
-          <span className="leading-none">
-            <span className="block whitespace-nowrap bg-gradient-to-r from-accent via-primary to-primary bg-clip-text text-base font-extrabold tracking-[-0.01em] text-transparent sm:text-lg">
+          <span className="bg-gradient-to-r from-accent to-primary bg-clip-text leading-none text-transparent">
+            <span className="block whitespace-nowrap text-base font-extrabold sm:text-lg">
               WorkWave
             </span>
-            <span className="mt-1 block whitespace-nowrap bg-gradient-to-r from-accent to-primary bg-clip-text text-[9px] font-bold uppercase tracking-[0.18em] text-transparent sm:text-[10px] sm:tracking-[0.24em]">
+            <span className="mt-1 block whitespace-nowrap text-[9px] font-bold uppercase tracking-[0.18em] sm:text-[10px] sm:tracking-[0.24em]">
               by Jobify
             </span>
           </span>

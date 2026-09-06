@@ -92,6 +92,26 @@ function About() {
         </div>
       </div>
 
+      <section className="mt-10 border-y border-border py-10 sm:py-14">
+        <p className="text-sm font-bold uppercase tracking-widest text-accent">The people behind WorkWave</p>
+        <div className="mt-4 grid gap-8 sm:grid-cols-[1.2fr_1fr] sm:items-end">
+          <div>
+            <h2 className="text-2xl font-extrabold text-foreground sm:text-4xl">
+              Founded by <span className="bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent">Raghav Agarwal</span>
+            </h2>
+            <p className="mt-4 max-w-xl text-base leading-relaxed text-muted-foreground">
+              WorkWave was founded by Raghav Agarwal and built with Team Jobify—a group bringing together different ideas and skills to make local work simpler.
+            </p>
+          </div>
+          <div>
+            <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Team Jobify</p>
+            <p className="mt-3 text-lg font-semibold leading-relaxed text-foreground">
+              Raghav Agarwal, Aditi Arun, Rudransh Rathore, Aadit Nair and Aarav Khandelwal
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* Values grid */}
       <div className="mt-10 grid gap-5 sm:grid-cols-2">
         {values.map((v) => (
