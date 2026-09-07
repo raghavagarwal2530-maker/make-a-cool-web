@@ -60,6 +60,12 @@ function Home() {
           >
             Post a gig
           </Link>
+          <Link
+            to="/volunteer"
+            className="rounded-full border border-accent/60 bg-accent/10 px-6 py-3 text-sm font-semibold text-accent transition-colors hover:bg-accent/20"
+          >
+            Volunteer
+          </Link>
         </div>
       </section>
 
