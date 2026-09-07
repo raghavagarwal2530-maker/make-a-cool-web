@@ -133,6 +133,21 @@ function Pricing() {
         </div>
       </div>
 
+      {/* Volunteering */}
+      <div className="mt-8 rounded-2xl border border-accent/40 bg-accent/5 p-6 sm:p-8">
+        <h2 className="text-lg font-bold text-foreground">Volunteering & communities</h2>
+        <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+          <strong className="text-foreground">Joining a community is completely free</strong> — it's
+          volunteering, so we never charge for it, and volunteers of any age are welcome.
+        </p>
+        <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+          <strong className="text-foreground">Your first community is free</strong> as a trial. Every
+          community you create after that costs{" "}
+          <strong className="text-foreground">AED 50</strong> each. Creating a community requires
+          being 18 or older.
+        </p>
+      </div>
+
       {/* Bottom note */}
       <div className="mt-8 rounded-2xl border border-primary/30 bg-primary/5 p-6 sm:p-8">
         <h2 className="text-lg font-bold text-foreground">Part-time jobs & companies</h2>

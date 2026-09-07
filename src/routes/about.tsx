@@ -102,6 +102,27 @@ function About() {
         ))}
       </div>
 
+      {/* Volunteering */}
+      <div className="mt-10 rounded-2xl border border-accent/40 bg-accent/5 p-8 sm:p-10">
+        <h2 className="text-xl font-bold text-foreground">Volunteering is for everyone</h2>
+        <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground">
+          Alongside paid work, WorkWave has communities for volunteering — and those are open to any
+          age. A kid can join a community just as easily as an adult: they still confirm their email
+          so we know the account is real, but they can put down a parent or guardian's phone number
+          instead of their own. Joining is always free.
+        </p>
+        <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground">
+          Creating a community is the one part reserved for 18+, since a creator is responsible for
+          the people who show up. Your first community is free; each one after that is AED 50.
+        </p>
+        <Link
+          to="/volunteer"
+          className="mt-6 inline-flex rounded-full border border-accent/60 bg-accent/10 px-5 py-2.5 text-sm font-semibold text-accent transition-colors hover:bg-accent/20"
+        >
+          Explore volunteering
+        </Link>
+      </div>
+
       {/* Trust banner */}
       <div className="mt-10 rounded-2xl border border-primary/30 bg-primary/5 p-8 sm:p-10">
         <h2 className="text-xl font-bold text-foreground">Safety by design</h2>

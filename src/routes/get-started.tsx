@@ -5,7 +5,12 @@ import { supabase } from "@/integrations/supabase/client";
 export const Route = createFileRoute("/get-started")({
   validateSearch: (search: Record<string, unknown>): { role?: Role } => {
     const role = search["role"];
-    return role === "requester" || role === "doer" ? { role } : {};
+    return role === "requester" ||
+      role === "doer" ||
+      role === "community" ||
+      role === "volunteer"
+      ? { role }
+      : {};
   },
   head: () => ({
     meta: [
@@ -28,7 +33,9 @@ export const Route = createFileRoute("/get-started")({
   component: GetStarted,
 });
 
-type Role = "requester" | "doer";
+type Role = "requester" | "doer" | "community" | "volunteer";
+
+const roles: Role[] = ["requester", "doer", "community", "volunteer"];
 
 const card =
   "rounded-2xl border border-border bg-card/80 p-6 backdrop-blur shadow-[0_20px_60px_-30px_oklch(0.62_0.22_305/0.8)]";
@@ -91,8 +98,8 @@ function GetStarted() {
       "workwave-onboarding-email",
     );
 
-    if (savedRole === "requester" || savedRole === "doer") {
-      setRole(savedRole);
+    if (savedRole && roles.includes(savedRole as Role)) {
+      setRole(savedRole as Role);
     }
 
     if (savedEmail) {
@@ -350,8 +357,12 @@ function GetStarted() {
       return;
     }
 
-    if (age(birthdate) < 18) {
-      setError("You must be 18 or older to use WorkWave.");
+    if (role !== "volunteer" && age(birthdate) < 18) {
+      setError(
+        role === "community"
+          ? "You must be 18 or older to create a community."
+          : "You must be 18 or older to use WorkWave.",
+      );
       return;
     }
 
@@ -436,13 +447,20 @@ function GetStarted() {
       {step === 0 && (
         <div className={`mt-8 ${card}`}>
           <h2 className="text-xl font-bold text-foreground">
-            Would you like to post a gig or find work?
+            Would you like to post a gig, find work or volunteer?
           </h2>
 
           <p className="mt-2 text-sm text-muted-foreground">
             You can switch later — this just sets up the right home screen
             for you.
           </p>
+
+          <Link
+            to="/volunteer"
+            className="mt-4 inline-flex text-sm font-semibold text-accent underline-offset-4 hover:underline"
+          >
+            I'd like to volunteer instead →
+          </Link>
 
           <div className="mt-6 grid gap-4 sm:grid-cols-2">
             {[
@@ -639,8 +657,11 @@ function GetStarted() {
           </h2>
 
           <p className="mt-2 text-sm text-muted-foreground">
-            Your phone is required so both sides know who they're dealing
-            with. You must be 18 or older to work on WorkWave.
+            {role === "volunteer"
+              ? "Volunteers of any age are welcome. If you're under 18, add a parent or guardian's phone number so we can reach someone."
+              : role === "community"
+                ? "Your phone is required so members know who runs the community. Community creators must be 18 or older."
+                : "Your phone is required so both sides know who they're dealing with. You must be 18 or older to work on WorkWave."}
           </p>
 
           <div className="mt-6 grid gap-5 sm:grid-cols-2">
@@ -755,8 +776,15 @@ function GetStarted() {
           </h2>
 
           <p className="mt-2 text-sm text-muted-foreground">
-            Email confirmed, phone saved and age checked. You're set up to{" "}
-            {role === "requester" ? "post gigs" : "find work"} on WorkWave.
+            Email confirmed and phone saved. You're set up to{" "}
+            {role === "requester"
+              ? "post gigs"
+              : role === "community"
+                ? "create your community"
+                : role === "volunteer"
+                  ? "join a volunteering community"
+                  : "find work"}{" "}
+            on WorkWave.
           </p>
 
           <div className="mt-6 flex flex-wrap gap-3">
