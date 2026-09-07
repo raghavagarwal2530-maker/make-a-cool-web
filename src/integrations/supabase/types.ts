@@ -14,6 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      gigs: {
+        Row: {
+          created_at: string
+          description: string
+          gig_type: string
+          id: string
+          latitude: number | null
+          location_label: string
+          longitude: number | null
+          pay: string | null
+          poster_name: string | null
+          timing: string | null
+          title: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          gig_type?: string
+          id?: string
+          latitude?: number | null
+          location_label: string
+          longitude?: number | null
+          pay?: string | null
+          poster_name?: string | null
+          timing?: string | null
+          title: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          gig_type?: string
+          id?: string
+          latitude?: number | null
+          location_label?: string
+          longitude?: number | null
+          pay?: string | null
+          poster_name?: string | null
+          timing?: string | null
+          title?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       onboarding_profiles: {
         Row: {
           age_confirmed: boolean
