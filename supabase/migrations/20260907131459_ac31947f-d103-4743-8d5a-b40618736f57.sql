@@ -1,0 +1,2 @@
+ALTER TABLE public.onboarding_profiles DROP CONSTRAINT IF EXISTS onboarding_profiles_role_check;
+ALTER TABLE public.onboarding_profiles ADD CONSTRAINT onboarding_profiles_role_check CHECK (role IN ('requester','doer','community','volunteer'));
