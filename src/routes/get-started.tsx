@@ -357,8 +357,12 @@ function GetStarted() {
       return;
     }
 
-    if (age(birthdate) < 18) {
-      setError("You must be 18 or older to use WorkWave.");
+    if (role !== "volunteer" && age(birthdate) < 18) {
+      setError(
+        role === "community"
+          ? "You must be 18 or older to create a community."
+          : "You must be 18 or older to use WorkWave.",
+      );
       return;
     }
 
@@ -443,13 +447,20 @@ function GetStarted() {
       {step === 0 && (
         <div className={`mt-8 ${card}`}>
           <h2 className="text-xl font-bold text-foreground">
-            Would you like to post a gig or find work?
+            Would you like to post a gig, find work or volunteer?
           </h2>
 
           <p className="mt-2 text-sm text-muted-foreground">
             You can switch later — this just sets up the right home screen
             for you.
           </p>
+
+          <Link
+            to="/volunteer"
+            className="mt-4 inline-flex text-sm font-semibold text-accent underline-offset-4 hover:underline"
+          >
+            I'd like to volunteer instead →
+          </Link>
 
           <div className="mt-6 grid gap-4 sm:grid-cols-2">
             {[
