@@ -5,7 +5,12 @@ import { supabase } from "@/integrations/supabase/client";
 export const Route = createFileRoute("/get-started")({
   validateSearch: (search: Record<string, unknown>): { role?: Role } => {
     const role = search["role"];
-    return role === "requester" || role === "doer" ? { role } : {};
+    return role === "requester" ||
+      role === "doer" ||
+      role === "community" ||
+      role === "volunteer"
+      ? { role }
+      : {};
   },
   head: () => ({
     meta: [
