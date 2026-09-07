@@ -33,7 +33,9 @@ export const Route = createFileRoute("/get-started")({
   component: GetStarted,
 });
 
-type Role = "requester" | "doer";
+type Role = "requester" | "doer" | "community" | "volunteer";
+
+const roles: Role[] = ["requester", "doer", "community", "volunteer"];
 
 const card =
   "rounded-2xl border border-border bg-card/80 p-6 backdrop-blur shadow-[0_20px_60px_-30px_oklch(0.62_0.22_305/0.8)]";
@@ -96,8 +98,8 @@ function GetStarted() {
       "workwave-onboarding-email",
     );
 
-    if (savedRole === "requester" || savedRole === "doer") {
-      setRole(savedRole);
+    if (savedRole && roles.includes(savedRole as Role)) {
+      setRole(savedRole as Role);
     }
 
     if (savedEmail) {
