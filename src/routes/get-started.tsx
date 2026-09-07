@@ -657,8 +657,11 @@ function GetStarted() {
           </h2>
 
           <p className="mt-2 text-sm text-muted-foreground">
-            Your phone is required so both sides know who they're dealing
-            with. You must be 18 or older to work on WorkWave.
+            {role === "volunteer"
+              ? "Volunteers of any age are welcome. If you're under 18, add a parent or guardian's phone number so we can reach someone."
+              : role === "community"
+                ? "Your phone is required so members know who runs the community. Community creators must be 18 or older."
+                : "Your phone is required so both sides know who they're dealing with. You must be 18 or older to work on WorkWave."}
           </p>
 
           <div className="mt-6 grid gap-5 sm:grid-cols-2">
@@ -773,8 +776,15 @@ function GetStarted() {
           </h2>
 
           <p className="mt-2 text-sm text-muted-foreground">
-            Email confirmed, phone saved and age checked. You're set up to{" "}
-            {role === "requester" ? "post gigs" : "find work"} on WorkWave.
+            Email confirmed and phone saved. You're set up to{" "}
+            {role === "requester"
+              ? "post gigs"
+              : role === "community"
+                ? "create your community"
+                : role === "volunteer"
+                  ? "join a volunteering community"
+                  : "find work"}{" "}
+            on WorkWave.
           </p>
 
           <div className="mt-6 flex flex-wrap gap-3">
