@@ -788,7 +788,17 @@ function GetStarted() {
           </p>
 
           <div className="mt-6 flex flex-wrap gap-3">
-            <Link to="/how-it-works" className={primaryBtn}>
+            {role === "requester" ? (
+              <Link to="/post-a-gig" className={primaryBtn}>
+                Start posting a gig
+              </Link>
+            ) : (
+              <Link to="/find-work" className={primaryBtn}>
+                Start finding work
+              </Link>
+            )}
+
+            <Link to="/how-it-works" className={ghostBtn}>
               See how it works
             </Link>
 
