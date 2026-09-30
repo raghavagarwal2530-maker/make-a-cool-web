@@ -1,6 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { AREAS, gigsSortedByDistanceFrom, gigDistance, type MockGig } from "@/lib/mock-gigs";
+import {
+  AREAS,
+  gigsSortedByDistanceFrom,
+  gigDistance,
+  type MockGig,
+} from "@/lib/mock-gigs";
 
 export const Route = createFileRoute("/find-work")({
   head: () => ({
@@ -8,7 +13,8 @@ export const Route = createFileRoute("/find-work")({
       { title: "Find work on WorkWave — gigs near you" },
       {
         name: "description",
-        content: "Browse gigs, shifts and part-time jobs near you, sorted by distance.",
+        content:
+          "Tell us your area, course and what you want — we filter gigs near you.",
       },
     ],
   }),
@@ -19,7 +25,7 @@ const card =
   "rounded-2xl border border-border bg-card/80 p-6 backdrop-blur shadow-[0_20px_60px_-30px_oklch(0.62_0.22_305/0.8)]";
 
 const input =
-  "mt-1 w-full rounded-xl border border-border bg-background/70 px-4 py-2.5 text-sm text-foreground outline-none transition-colors focus:border-primary";
+  "mt-1 w-full rounded-xl border border-border bg-background/70 px-4 py-2.5 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-primary";
 
 const primaryBtn =
   "rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50";
@@ -33,17 +39,36 @@ const typeStyles: Record<MockGig["type"], string> = {
   "part-time": "bg-emerald-500/15 text-emerald-600",
 };
 
+const WORK_TYPES: { key: MockGig["type"]; label: string; body: string }[] = [
+  {
+    key: "one-time",
+    label: "One-time gigs",
+    body: "Single tasks — move, clean, assemble.",
+  },
+  {
+    key: "recurring",
+    label: "Recurring shifts",
+    body: "The same shift every week.",
+  },
+  {
+    key: "part-time",
+    label: "Part-time jobs",
+    body: "Regular part-time roles & communities.",
+  },
+];
+
 function FindWork() {
   const [area, setArea] = useState("");
-  const [filter, setFilter] = useState<"all" | MockGig["type"]>("all");
+  const [uni, setUni] = useState("");
+  const [course, setCourse] = useState("");
+  const [workType, setWorkType] = useState<MockGig["type"] | "">("");
   const [submitted, setSubmitted] = useState(false);
+  const [registered, setRegistered] = useState(false);
 
   const gigs = useMemo(() => {
-    if (!submitted || !area) return [];
-    return gigsSortedByDistanceFrom(area).filter(
-      (g) => filter === "all" || g.type === filter,
-    );
-  }, [submitted, area, filter]);
+    if (!submitted || !area || !workType) return [];
+    return gigsSortedByDistanceFrom(area).filter((g) => g.type === workType);
+  }, [submitted, area, workType]);
 
   return (
     <div className="mx-auto max-w-3xl px-5 pb-20 pt-16">
@@ -57,14 +82,17 @@ function FindWork() {
         </span>
       </h1>
 
-      {/* Location selector */}
+      {/* Questions */}
       <div className={`mt-8 ${card}`}>
-        <h2 className="text-xl font-bold text-foreground">Where are you?</h2>
+        <h2 className="text-xl font-bold text-foreground">
+          Tell us what you’re looking for
+        </h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          Tell us your area and we'll sort every gig from closest to farthest.
+          Answer a few quick questions and we’ll filter gigs to fit you.
         </p>
+
         <label className="mt-6 block text-sm font-medium text-foreground">
-          Your area
+          Which area do you want to find work in?
           <select
             value={area}
             onChange={(e) => setArea(e.target.value)}
@@ -78,10 +106,59 @@ function FindWork() {
             ))}
           </select>
         </label>
+
+        <label className="mt-5 block text-sm font-medium text-foreground">
+          University{" "}
+          <span className="font-normal text-muted-foreground">(optional)</span>
+          <input
+            value={uni}
+            onChange={(e) => setUni(e.target.value)}
+            placeholder="e.g. University of Wollongong Dubai"
+            maxLength={120}
+            className={input}
+          />
+        </label>
+
+        <label className="mt-5 block text-sm font-medium text-foreground">
+          Course you’re studying
+          <input
+            value={course}
+            onChange={(e) => setCourse(e.target.value)}
+            placeholder="e.g. Business, Computer Science"
+            maxLength={120}
+            className={input}
+          />
+        </label>
+
+        <p className="mt-6 text-sm font-medium text-foreground">
+          What do you want to find?
+        </p>
+        <div className="mt-3 grid gap-3 sm:grid-cols-3">
+          {WORK_TYPES.map((o) => (
+            <button
+              key={o.key}
+              type="button"
+              onClick={() => setWorkType(o.key)}
+              className={`rounded-xl border p-4 text-left transition-colors ${
+                workType === o.key
+                  ? "border-primary bg-primary/10"
+                  : "border-border bg-background/50 hover:border-primary/60"
+              }`}
+            >
+              <span className="block text-sm font-semibold text-foreground">
+                {o.label}
+              </span>
+              <span className="mt-1 block text-xs text-muted-foreground">
+                {o.body}
+              </span>
+            </button>
+          ))}
+        </div>
+
         <div className="mt-6 flex flex-wrap gap-3">
           <button
             type="button"
-            disabled={!area}
+            disabled={!area || !workType}
             onClick={() => setSubmitted(true)}
             className={primaryBtn}
           >
@@ -94,91 +171,112 @@ function FindWork() {
       </div>
 
       {/* Results */}
-      {submitted && area && (
+      {submitted && area && workType && (
         <div className="mt-8">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <p className="text-sm font-semibold text-foreground">
-              {gigs.length} gig{gigs.length === 1 ? "" : "s"} near {area}
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {(["all", "one-time", "recurring", "part-time"] as const).map((f) => (
-                <button
-                  key={f}
-                  type="button"
-                  onClick={() => setFilter(f)}
-                  className={`rounded-full px-3 py-1.5 text-xs font-semibold capitalize transition-colors ${
-                    filter === f
-                      ? "bg-primary text-primary-foreground"
-                      : "border border-border text-muted-foreground hover:border-primary hover:text-primary"
-                  }`}
-                >
-                  {f === "part-time" ? "part-time" : f}
-                </button>
-              ))}
-            </div>
-          </div>
-
+          <p className="text-sm font-semibold text-foreground">
+            {gigs.length} {workType.replace("-", " ")} gig
+            {gigs.length === 1 ? "" : "s"} near {area}
+          </p>
           <p className="mt-2 text-xs text-muted-foreground">
             Sorted by distance — closest first.
           </p>
 
-          <ul className="mt-5 space-y-4">
-            {gigs.map((g) => {
-              const km = gigDistance(area, g);
-              return (
-                <li
-                  key={g.id}
-                  className="rounded-2xl border border-border bg-card/80 p-5 backdrop-blur transition-colors hover:border-primary"
-                >
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span
-                          className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold capitalize ${typeStyles[g.type]}`}
-                        >
-                          {g.type}
-                        </span>
-                        <span className="text-xs text-muted-foreground">
-                          {g.posted}
-                        </span>
+          {gigs.length === 0 ? (
+            <p className="mt-5 rounded-xl border border-border bg-card/60 p-5 text-sm text-muted-foreground">
+              No {workType.replace("-", " ")} gigs near {area} right now. Try
+              another area or check back soon.
+            </p>
+          ) : (
+            <ul className="mt-5 space-y-4">
+              {gigs.map((g) => {
+                const km = gigDistance(area, g);
+                return (
+                  <li
+                    key={g.id}
+                    className="rounded-2xl border border-border bg-card/80 p-5 backdrop-blur transition-colors hover:border-primary"
+                  >
+                    <div className="flex items-start justify-between gap-4">
+                      <div>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span
+                            className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold capitalize ${typeStyles[g.type]}`}
+                          >
+                            {g.type}
+                          </span>
+                          <span className="text-xs text-muted-foreground">
+                            {g.posted}
+                          </span>
+                        </div>
+                        <h3 className="mt-2 text-base font-semibold text-foreground">
+                          {g.title}
+                        </h3>
+                        <p className="mt-1 text-sm text-muted-foreground">
+                          {g.company} · {g.area}
+                        </p>
+                        <p className="mt-1 text-sm text-muted-foreground">
+                          {g.duration}
+                        </p>
                       </div>
-                      <h3 className="mt-2 text-base font-semibold text-foreground">
-                        {g.title}
-                      </h3>
-                      <p className="mt-1 text-sm text-muted-foreground">
-                        {g.company} · {g.area}
-                      </p>
-                      <p className="mt-1 text-sm text-muted-foreground">
-                        {g.duration}
-                      </p>
+                      <div className="shrink-0 text-right">
+                        <p className="text-sm font-bold text-foreground">
+                          {g.pay}
+                        </p>
+                        <p className="mt-1 text-xs font-medium text-accent">
+                          {km < 1 ? "<1 km" : `${km.toFixed(1)} km`}
+                        </p>
+                      </div>
                     </div>
-                    <div className="shrink-0 text-right">
-                      <p className="text-sm font-bold text-foreground">{g.pay}</p>
-                      <p className="mt-1 text-xs font-medium text-accent">
-                        {km < 1 ? "<1 km" : `${km.toFixed(1)} km`}
-                      </p>
+                    <div className="mt-4 flex gap-3">
+                      <button
+                        type="button"
+                        className="rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+                      >
+                        Apply
+                      </button>
+                      <button
+                        type="button"
+                        className="rounded-full border border-border px-4 py-2 text-xs font-semibold text-muted-foreground transition-colors hover:border-primary hover:text-primary"
+                      >
+                        Details
+                      </button>
                     </div>
-                  </div>
-                  <div className="mt-4 flex gap-3">
-                    <button
-                      type="button"
-                      className="rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
-                    >
-                      Apply
-                    </button>
-                    <button
-                      type="button"
-                      className="rounded-full border border-border px-4 py-2 text-xs font-semibold text-muted-foreground transition-colors hover:border-primary hover:text-primary"
-                    >
-                      Details
-                    </button>
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
         </div>
       )}
+
+      {/* Register as available */}
+      <div className={`mt-8 ${card}`}>
+        <h2 className="text-xl font-bold text-foreground">Ready to work?</h2>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Register your name and area so companies can find and hire you. Once
+          you’re on the list, you can also contact anyone posting a gig that
+          fits you.
+        </p>
+        {registered ? (
+          <p className="mt-4 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-600">
+            You’re on the hireable list 🎉 Companies can now find you for{" "}
+            {area || "your area"}.
+          </p>
+        ) : (
+          <div className="mt-5 flex flex-wrap gap-3">
+            <button
+              type="button"
+              disabled={!area}
+              onClick={() => setRegistered(true)}
+              className={primaryBtn}
+            >
+              Register as available
+            </button>
+            <Link to="/get-started" search={{}} className={ghostBtn}>
+              Verify my profile first
+            </Link>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

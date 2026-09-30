@@ -581,7 +581,7 @@ function GetStarted() {
           ) : (
             <>
               <h2 className="text-xl font-bold text-foreground">
-                Check your email
+                Enter the code from your email
               </h2>
 
               <p className="mt-2 text-sm text-muted-foreground">
@@ -589,8 +589,9 @@ function GetStarted() {
                 <span className="font-semibold text-foreground">
                   {email}
                 </span>
-                . Open it and select “Verify this email.” You’ll return to
-                WorkWave and move to the next step automatically.
+                . Open it and enter the 6-digit code below to continue to
+                your phone number. You can also select “Verify this email”
+                in the message to come back automatically.
               </p>
 
               <p className="mt-4 text-sm text-muted-foreground">
@@ -601,7 +602,7 @@ function GetStarted() {
           )}
 
           <label className="mt-6 block text-sm font-medium text-foreground">
-            Or enter the code from the email (if it shows one)
+            Verification code
 
             <input
               value={code}
