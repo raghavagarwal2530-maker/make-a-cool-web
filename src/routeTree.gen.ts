@@ -11,8 +11,10 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
+import { Route as FindWorkRouteImport } from './routes/find-work'
 import { Route as GetStartedRouteImport } from './routes/get-started'
 import { Route as HowItWorksRouteImport } from './routes/how-it-works'
+import { Route as PostAGigRouteImport } from './routes/post-a-gig'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as VolunteerRouteImport } from './routes/volunteer'
 
@@ -26,6 +28,11 @@ const AboutRoute = AboutRouteImport.update({
   path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FindWorkRoute = FindWorkRouteImport.update({
+  id: '/find-work',
+  path: '/find-work',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const GetStartedRoute = GetStartedRouteImport.update({
   id: '/get-started',
   path: '/get-started',
@@ -34,6 +41,11 @@ const GetStartedRoute = GetStartedRouteImport.update({
 const HowItWorksRoute = HowItWorksRouteImport.update({
   id: '/how-it-works',
   path: '/how-it-works',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PostAGigRoute = PostAGigRouteImport.update({
+  id: '/post-a-gig',
+  path: '/post-a-gig',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PricingRoute = PricingRouteImport.update({
@@ -50,16 +62,20 @@ const VolunteerRoute = VolunteerRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/find-work': typeof FindWorkRoute
   '/get-started': typeof GetStartedRoute
   '/how-it-works': typeof HowItWorksRoute
+  '/post-a-gig': typeof PostAGigRoute
   '/pricing': typeof PricingRoute
   '/volunteer': typeof VolunteerRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/find-work': typeof FindWorkRoute
   '/get-started': typeof GetStartedRoute
   '/how-it-works': typeof HowItWorksRoute
+  '/post-a-gig': typeof PostAGigRoute
   '/pricing': typeof PricingRoute
   '/volunteer': typeof VolunteerRoute
 }
@@ -67,8 +83,10 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/find-work': typeof FindWorkRoute
   '/get-started': typeof GetStartedRoute
   '/how-it-works': typeof HowItWorksRoute
+  '/post-a-gig': typeof PostAGigRoute
   '/pricing': typeof PricingRoute
   '/volunteer': typeof VolunteerRoute
 }
@@ -77,24 +95,30 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
+    | '/find-work'
     | '/get-started'
     | '/how-it-works'
+    | '/post-a-gig'
     | '/pricing'
     | '/volunteer'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/about'
+    | '/find-work'
     | '/get-started'
     | '/how-it-works'
+    | '/post-a-gig'
     | '/pricing'
     | '/volunteer'
   id:
     | '__root__'
     | '/'
     | '/about'
+    | '/find-work'
     | '/get-started'
     | '/how-it-works'
+    | '/post-a-gig'
     | '/pricing'
     | '/volunteer'
   fileRoutesById: FileRoutesById
@@ -102,8 +126,10 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  FindWorkRoute: typeof FindWorkRoute
   GetStartedRoute: typeof GetStartedRoute
   HowItWorksRoute: typeof HowItWorksRoute
+  PostAGigRoute: typeof PostAGigRoute
   PricingRoute: typeof PricingRoute
   VolunteerRoute: typeof VolunteerRoute
 }
@@ -124,6 +150,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/find-work': {
+      id: '/find-work'
+      path: '/find-work'
+      fullPath: '/find-work'
+      preLoaderRoute: typeof FindWorkRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/get-started': {
       id: '/get-started'
       path: '/get-started'
@@ -136,6 +169,13 @@ declare module '@tanstack/react-router' {
       path: '/how-it-works'
       fullPath: '/how-it-works'
       preLoaderRoute: typeof HowItWorksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/post-a-gig': {
+      id: '/post-a-gig'
+      path: '/post-a-gig'
+      fullPath: '/post-a-gig'
+      preLoaderRoute: typeof PostAGigRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/pricing': {
@@ -158,8 +198,10 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  FindWorkRoute: FindWorkRoute,
   GetStartedRoute: GetStartedRoute,
   HowItWorksRoute: HowItWorksRoute,
+  PostAGigRoute: PostAGigRoute,
   PricingRoute: PricingRoute,
   VolunteerRoute: VolunteerRoute,
 }
