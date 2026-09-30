@@ -16,6 +16,8 @@ export interface HireableWorker {
   skills: string[];
 }
 
+// Mutable list — new registrations from the Find Work page are added here
+// at runtime so the Post-a-gig matcher can pick them up in the same session.
 export const MOCK_WORKERS: HireableWorker[] = [
   {
     id: "w1",
@@ -90,6 +92,33 @@ export const MOCK_WORKERS: HireableWorker[] = [
     skills: ["Cleaning", "Painting", "Gardening"],
   },
 ];
+
+let _nextId = 100;
+
+export function registerWorker(
+  name: string,
+  area: string,
+  workTypes: GigType[],
+  phone: string,
+  skills: string[],
+  uni: string | null = null,
+  course: string | null = null,
+): HireableWorker {
+  const worker: HireableWorker = {
+    id: `w${_nextId++}`,
+    name,
+    area,
+    workTypes,
+    uni,
+    course,
+    ready: true,
+    phone,
+    rating: 0,
+    skills,
+  };
+  MOCK_WORKERS.push(worker);
+  return worker;
+}
 
 export function workersMatching(
   area: string | null,

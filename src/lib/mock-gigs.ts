@@ -14,6 +14,7 @@ export interface MockGig {
   lng: number;
   posted: string;
   duration: string;
+  phone: string;
 }
 
 // UAE areas with approximate coordinates (lat, lng).
@@ -42,6 +43,7 @@ export const MOCK_GIGS: MockGig[] = [
     lng: 55.139,
     posted: "2h ago",
     duration: "3–4 hours",
+    phone: "+971 50 100 0001",
   },
   {
     id: "g2",
@@ -54,6 +56,7 @@ export const MOCK_GIGS: MockGig[] = [
     lng: 55.2744,
     posted: "5h ago",
     duration: "Mon–Fri, 6–10am",
+    phone: "+971 50 100 0002",
   },
   {
     id: "g3",
@@ -66,6 +69,7 @@ export const MOCK_GIGS: MockGig[] = [
     lng: 55.242,
     posted: "1d ago",
     duration: "Every Sat, 8am–2pm",
+    phone: "+971 50 100 0003",
   },
   {
     id: "g4",
@@ -78,6 +82,7 @@ export const MOCK_GIGS: MockGig[] = [
     lng: 55.139,
     posted: "3h ago",
     duration: "Evenings, 4–9pm",
+    phone: "+971 50 100 0004",
   },
   {
     id: "g5",
@@ -90,6 +95,7 @@ export const MOCK_GIGS: MockGig[] = [
     lng: 55.209,
     posted: "6h ago",
     duration: "1–2 days",
+    phone: "+971 50 100 0005",
   },
   {
     id: "g6",
@@ -102,6 +108,7 @@ export const MOCK_GIGS: MockGig[] = [
     lng: 55.3373,
     posted: "8h ago",
     duration: "Fri–Sun, 12–8pm",
+    phone: "+971 50 100 0006",
   },
   {
     id: "g7",
@@ -114,6 +121,7 @@ export const MOCK_GIGS: MockGig[] = [
     lng: 55.208,
     posted: "1d ago",
     duration: "2x weekly, 1.5hr",
+    phone: "+971 50 100 0007",
   },
   {
     id: "g8",
@@ -126,6 +134,7 @@ export const MOCK_GIGS: MockGig[] = [
     lng: 55.2105,
     posted: "4h ago",
     duration: "Half day",
+    phone: "+971 50 100 0008",
   },
   {
     id: "g9",
@@ -138,6 +147,7 @@ export const MOCK_GIGS: MockGig[] = [
     lng: 55.4209,
     posted: "2d ago",
     duration: "Sun–Thu, 6–10pm",
+    phone: "+971 50 100 0009",
   },
   {
     id: "g10",
@@ -150,6 +160,7 @@ export const MOCK_GIGS: MockGig[] = [
     lng: 54.3773,
     posted: "12h ago",
     duration: "9am–3pm, weekdays",
+    phone: "+971 50 100 0010",
   },
   {
     id: "g11",
@@ -162,6 +173,7 @@ export const MOCK_GIGS: MockGig[] = [
     lng: 55.139,
     posted: "7h ago",
     duration: "2–3 hours",
+    phone: "+971 50 100 0011",
   },
   {
     id: "g12",
@@ -174,6 +186,7 @@ export const MOCK_GIGS: MockGig[] = [
     lng: 55.242,
     posted: "1d ago",
     duration: "3x weekly, 2hr",
+    phone: "+971 50 100 0012",
   },
 ];
 

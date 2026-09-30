@@ -5,7 +5,9 @@ import {
   gigsSortedByDistanceFrom,
   gigDistance,
   type MockGig,
+  type GigType,
 } from "@/lib/mock-gigs";
+import { registerWorker } from "@/lib/mock-workers";
 
 export const Route = createFileRoute("/find-work")({
   head: () => ({
@@ -63,6 +65,13 @@ function FindWork() {
   const [course, setCourse] = useState("");
   const [workType, setWorkType] = useState<MockGig["type"] | "">("");
   const [submitted, setSubmitted] = useState(false);
+  const [appliedGigs, setAppliedGigs] = useState<Set<string>>(new Set());
+
+  // Registration form
+  const [regName, setRegName] = useState("");
+  const [regPhone, setRegPhone] = useState("");
+  const [regSkills, setRegSkills] = useState("");
+  const [regReady, setRegReady] = useState(false);
   const [registered, setRegistered] = useState(false);
 
   const gigs = useMemo(() => {
@@ -226,19 +235,36 @@ function FindWork() {
                         </p>
                       </div>
                     </div>
-                    <div className="mt-4 flex gap-3">
-                      <button
-                        type="button"
-                        className="rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
-                      >
-                        Apply
-                      </button>
-                      <button
-                        type="button"
-                        className="rounded-full border border-border px-4 py-2 text-xs font-semibold text-muted-foreground transition-colors hover:border-primary hover:text-primary"
-                      >
-                        Details
-                      </button>
+                    <div className="mt-4 flex flex-wrap items-center gap-3">
+                      {appliedGigs.has(g.id) ? (
+                        <div className="flex flex-wrap items-center gap-3">
+                          <span className="rounded-full bg-emerald-500/10 px-3 py-2 text-xs font-semibold text-emerald-600">
+                            Applied ✓
+                          </span>
+                          <a
+                            href={`tel:${g.phone.replace(/\s/g, "")}`}
+                            className="rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+                          >
+                            Call {g.phone}
+                          </a>
+                          <a
+                            href={`sms:${g.phone.replace(/\s/g, "")}`}
+                            className="rounded-full border border-border px-4 py-2 text-xs font-semibold text-muted-foreground transition-colors hover:border-primary hover:text-primary"
+                          >
+                            Message
+                          </a>
+                        </div>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setAppliedGigs((prev) => new Set(prev).add(g.id))
+                          }
+                          className="rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+                        >
+                          Apply
+                        </button>
+                      )}
                     </div>
                   </li>
                 );
@@ -252,28 +278,102 @@ function FindWork() {
       <div className={`mt-8 ${card}`}>
         <h2 className="text-xl font-bold text-foreground">Ready to work?</h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          Register your name and area so companies can find and hire you. Once
-          you’re on the list, you can also contact anyone posting a gig that
-          fits you.
+          Register your name and details so companies can find and hire you.
+          Once you’re on the list, anyone posting a gig that matches you can
+          get in contact — and you can reach out to any gig above.
         </p>
         {registered ? (
-          <p className="mt-4 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-600">
-            You’re on the hireable list 🎉 Companies can now find you for{" "}
-            {area || "your area"}.
-          </p>
+          <div className="mt-4 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-600">
+            <p className="font-semibold">
+              You’re on the hireable list 🎉
+            </p>
+            <p className="mt-1 text-emerald-700">
+              {regName} in {area || "your area"} — companies can now find and
+              contact you for work.
+            </p>
+          </div>
         ) : (
-          <div className="mt-5 flex flex-wrap gap-3">
-            <button
-              type="button"
-              disabled={!area}
-              onClick={() => setRegistered(true)}
-              className={primaryBtn}
-            >
-              Register as available
-            </button>
-            <Link to="/get-started" search={{}} className={ghostBtn}>
-              Verify my profile first
-            </Link>
+          <div className="mt-5 space-y-4">
+            <label className="block text-sm font-medium text-foreground">
+              Your name
+              <input
+                value={regName}
+                onChange={(e) => setRegName(e.target.value)}
+                placeholder="e.g. Sara A."
+                maxLength={80}
+                className={input}
+              />
+            </label>
+            <label className="block text-sm font-medium text-foreground">
+              Phone number
+              <input
+                value={regPhone}
+                onChange={(e) => setRegPhone(e.target.value)}
+                placeholder="e.g. +971 50 123 4567"
+                maxLength={30}
+                className={input}
+              />
+            </label>
+            <label className="block text-sm font-medium text-foreground">
+              Your skills (comma separated)
+              <input
+                value={regSkills}
+                onChange={(e) => setRegSkills(e.target.value)}
+                placeholder="e.g. Cleaning, Barista, Tutoring"
+                maxLength={200}
+                className={input}
+              />
+            </label>
+            <label className="flex items-start gap-3 text-sm text-foreground">
+              <input
+                type="checkbox"
+                checked={regReady}
+                onChange={(e) => setRegReady(e.target.checked)}
+                className="mt-1 size-4 rounded border-border accent-primary"
+              />
+              <span>
+                I’m ready to take on a job right now and want companies to
+                contact me.
+              </span>
+            </label>
+            <div className="flex flex-wrap gap-3">
+              <button
+                type="button"
+                disabled={
+                  !area ||
+                  !regName.trim() ||
+                  !regPhone.trim() ||
+                  !regReady
+                }
+                onClick={() => {
+                  const skillsList = regSkills
+                    .split(",")
+                    .map((s) => s.trim())
+                    .filter(Boolean);
+                  registerWorker(
+                    regName.trim(),
+                    area,
+                    workType ? [workType as GigType] : [],
+                    regPhone.trim(),
+                    skillsList,
+                    uni || null,
+                    course || null,
+                  );
+                  setRegistered(true);
+                }}
+                className={primaryBtn}
+              >
+                Register as available
+              </button>
+              <Link to="/get-started" search={{}} className={ghostBtn}>
+                Verify my profile first
+              </Link>
+            </div>
+            {!area && (
+              <p className="text-xs text-muted-foreground">
+                Pick an area above first so we know where to list you.
+              </p>
+            )}
           </div>
         )}
       </div>
