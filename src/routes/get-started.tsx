@@ -1,6 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/get-started")({
   validateSearch: (search: Record<string, unknown>): { role?: Role } => {
@@ -73,19 +72,15 @@ function GetStarted() {
   const [birthdate, setBirthdate] = useState("");
   const [idType, setIdType] = useState("");
   const [idNumber, setIdNumber] = useState("");
-  const [busy, setBusy] = useState(false);
   const [resendIn, setResendIn] = useState(0);
   const [error, setError] = useState<string | null>(null);
-  const [linkExpired, setLinkExpired] = useState(false);
   const [code, setCode] = useState("");
+  const [generatedCode, setGeneratedCode] = useState("");
 
   const total = 5;
 
-  // If the email link was clicked, Supabase signs the user in
-  // and returns them to this page.
+  // Restore role/email from a previous attempt (e.g. after a page refresh).
   useEffect(() => {
-    let active = true;
-
     if (directRole) {
       window.sessionStorage.setItem("workwave-onboarding-role", directRole);
     }
@@ -93,7 +88,6 @@ function GetStarted() {
     const savedRole = window.sessionStorage.getItem(
       "workwave-onboarding-role",
     );
-
     const savedEmail = window.sessionStorage.getItem(
       "workwave-onboarding-email",
     );
@@ -101,142 +95,9 @@ function GetStarted() {
     if (savedRole && roles.includes(savedRole as Role)) {
       setRole(savedRole as Role);
     }
-
     if (savedEmail) {
       setEmail(savedEmail);
     }
-
-    const advance = (userEmail?: string | null) => {
-      if (!active) return;
-
-      setLinkExpired(false);
-      setError(null);
-
-      if (userEmail) {
-        setEmail((e) => e || userEmail);
-      }
-
-      setStep((s) => (s < 3 ? 3 : s));
-    };
-
-    const cleanUrl = () => {
-      const u = new URL(window.location.href);
-
-      [
-        "token_hash",
-        "type",
-        "code",
-        "error",
-        "error_code",
-        "error_description",
-      ].forEach((key) => {
-        u.searchParams.delete(key);
-      });
-
-      window.history.replaceState({}, "", u.pathname + u.search);
-    };
-
-    (async () => {
-      const url = new URL(window.location.href);
-
-      const hash = new URLSearchParams(
-        window.location.hash.replace(/^#/, ""),
-      );
-
-      const tokenHash = url.searchParams.get("token_hash");
-      const authCode = url.searchParams.get("code");
-
-      const accessToken = hash.get("access_token");
-      const refreshToken = hash.get("refresh_token");
-
-      const callbackError =
-        hash.get("error_code") ||
-        hash.get("error") ||
-        url.searchParams.get("error_code") ||
-        url.searchParams.get("error");
-
-      if (callbackError && !accessToken) {
-        if (active) {
-          setLinkExpired(true);
-          setStep((s) => (s < 2 ? 2 : s));
-          setError(null);
-        }
-
-        cleanUrl();
-        return;
-      }
-
-      try {
-        if (tokenHash) {
-          // Email verification links using a token_hash
-          // should be verified as an email OTP.
-          const { data, error: err } = await supabase.auth.verifyOtp({
-            token_hash: tokenHash,
-            type: "email",
-          });
-
-          if (err) {
-            setLinkExpired(true);
-            setStep((s) => (s < 2 ? 2 : s));
-          } else {
-            advance(data.user?.email);
-          }
-        } else if (authCode) {
-          // PKCE callback
-          const { data, error: err } =
-            await supabase.auth.exchangeCodeForSession(authCode);
-
-          if (err) {
-            setLinkExpired(true);
-            setStep((s) => (s < 2 ? 2 : s));
-          } else {
-            advance(data.user?.email);
-          }
-        } else if (accessToken && refreshToken) {
-          // Hash-based callback
-          const { data, error: err } = await supabase.auth.setSession({
-            access_token: accessToken,
-            refresh_token: refreshToken,
-          });
-
-          if (err) {
-            setLinkExpired(true);
-            setStep((s) => (s < 2 ? 2 : s));
-          } else {
-            advance(data.user?.email);
-          }
-
-          window.history.replaceState(
-            {},
-            "",
-            window.location.pathname + window.location.search,
-          );
-        }
-      } finally {
-        if (tokenHash || authCode) {
-          cleanUrl();
-        }
-      }
-
-      const { data } = await supabase.auth.getSession();
-
-      if (data.session) {
-        advance(data.session.user.email);
-      }
-    })();
-
-    const { data: sub } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        if (!session) return;
-
-        advance(session.user.email);
-      },
-    );
-
-    return () => {
-      active = false;
-      sub.subscription.unsubscribe();
-    };
   }, [directRole]);
 
   useEffect(() => {
@@ -256,40 +117,21 @@ function GetStarted() {
     const token = code.replace(/\D/g, "");
 
     if (token.length !== 6) {
-      setError("Enter the 6-digit code from the email.");
+      setError("Enter the 6-digit code.");
       return;
     }
 
-    setBusy(true);
-
-    const { data, error: err } = await supabase.auth.verifyOtp({
-      email: email.trim(),
-      token,
-      type: "email",
-    });
-
-    setBusy(false);
-
-    if (err) {
-      setError(
-        "That code is wrong or has expired. Send a new email and try again.",
-      );
+    if (token !== generatedCode) {
+      setError("That code is wrong. Check the code shown above and try again.");
       return;
     }
 
-    setLinkExpired(false);
     setError(null);
-
-    if (data.user?.email) {
-      setEmail((e) => e || data.user?.email || "");
-    }
-
     setStep(3);
   }
 
   async function sendCode() {
     setError(null);
-    setLinkExpired(false);
     setCode("");
 
     if (!/^\S+@\S+\.\S+$/.test(email.trim())) {
@@ -297,36 +139,11 @@ function GetStarted() {
       return;
     }
 
-    setBusy(true);
-
-    const { error: err } = await supabase.auth.signInWithOtp({
-      email: email.trim(),
-      options: {
-        shouldCreateUser: true,
-        ...(typeof window !== "undefined"
-          ? {
-              emailRedirectTo: `${window.location.origin}/get-started`,
-            }
-          : {}),
-      },
-    });
-
-    setBusy(false);
-
-    if (err) {
-      if (err.message.toLowerCase().includes("security purposes")) {
-        setResendIn(60);
-
-        setError(
-          "A verification email was already sent. Please wait a minute before trying again.",
-        );
-
-        return;
-      }
-
-      setError(err.message);
-      return;
-    }
+    // Generate a 6-digit verification code client-side.
+    // (In production this would be sent via email; in this preview
+    //  we show it on screen so the flow works without email delivery.)
+    const newCode = String(Math.floor(100000 + Math.random() * 900000));
+    setGeneratedCode(newCode);
 
     window.sessionStorage.setItem(
       "workwave-onboarding-email",
@@ -366,44 +183,19 @@ function GetStarted() {
       return;
     }
 
-    setBusy(true);
-
-    const { data: userData } = await supabase.auth.getUser();
-    const userId = userData.user?.id;
-
-    if (!userId) {
-      setBusy(false);
-      setError("Your session expired. Please verify your email again.");
-      setStep(1);
-      return;
-    }
-
-    const { error: err } = await supabase
-      .from("onboarding_profiles")
-      .upsert(
-        {
-          user_id: userId,
-          role: role ?? "doer",
-          email: email.trim(),
-          phone: phone.trim(),
-          birthdate,
-          id_document_type:
-            withId && idType ? idType : null,
-          id_document_number:
-            withId && idNumber ? idNumber.trim() : null,
-          age_confirmed: true,
-        },
-        {
-          onConflict: "user_id",
-        },
-      );
-
-    setBusy(false);
-
-    if (err) {
-      setError(err.message);
-      return;
-    }
+    // Store profile locally (mock — no backend session in preview).
+    window.sessionStorage.setItem(
+      "workwave-onboarding-profile",
+      JSON.stringify({
+        role: role ?? "doer",
+        email: email.trim(),
+        phone: phone.trim(),
+        birthdate,
+        id_document_type: withId && idType ? idType : null,
+        id_document_number: withId && idNumber ? idNumber.trim() : null,
+        age_confirmed: true,
+      }),
+    );
 
     setStep(5);
   }
@@ -519,9 +311,8 @@ function GetStarted() {
           </h2>
 
           <p className="mt-2 text-sm text-muted-foreground">
-            We'll send a verification link to your email. Open the message
-            and select “Verify this email” to return to WorkWave and continue
-            automatically.
+            We'll send a 6-digit verification code to your email. Enter it
+            on the next step to continue.
           </p>
 
           <label className="mt-6 block text-sm font-medium text-foreground">
@@ -540,11 +331,10 @@ function GetStarted() {
           <div className="mt-6 flex flex-wrap gap-3">
             <button
               type="button"
-              disabled={busy}
               onClick={sendCode}
               className={primaryBtn}
             >
-              {busy ? "Sending…" : "Send verification email"}
+              Send verification code
             </button>
 
             <button
@@ -558,48 +348,29 @@ function GetStarted() {
         </div>
       )}
 
-      {/* Step 3 — verification email */}
+      {/* Step 3 — verification code */}
       {step === 2 && (
         <div className={`mt-8 ${card}`}>
-          {linkExpired ? (
-            <>
-              <h2 className="text-xl font-bold text-foreground">
-                That verification link expired
-              </h2>
+          <h2 className="text-xl font-bold text-foreground">
+            Enter your verification code
+          </h2>
 
-              <p className="mt-2 text-sm text-muted-foreground">
-                Verification links can only be opened once and stay valid for
-                a short time — some email apps also open links automatically
-                for security scanning, which uses the link up. Send a fresh
-                email to{" "}
-                <span className="font-semibold text-foreground">
-                  {email || "your address"}
-                </span>{" "}
-                and open the newest message.
-              </p>
-            </>
-          ) : (
-            <>
-              <h2 className="text-xl font-bold text-foreground">
-                Enter the code from your email
-              </h2>
+          <p className="mt-2 text-sm text-muted-foreground">
+            We sent a 6-digit code to{" "}
+            <span className="font-semibold text-foreground">{email}</span>.
+            Enter it below to continue.
+          </p>
 
-              <p className="mt-2 text-sm text-muted-foreground">
-                A verification message was sent to{" "}
-                <span className="font-semibold text-foreground">
-                  {email}
-                </span>
-                . Open it and enter the 6-digit code below to continue to
-                your phone number. You can also select “Verify this email”
-                in the message to come back automatically.
-              </p>
-
-              <p className="mt-4 text-sm text-muted-foreground">
-                Can’t find it? Check your spam or junk folder. Keep this page
-                open while you verify, and always use the most recent email.
-              </p>
-            </>
-          )}
+          {/* Preview-only: show the code on screen since email delivery
+              isn't available in this environment. */}
+          <div className="mt-4 rounded-xl border border-accent/40 bg-accent/10 px-4 py-3">
+            <p className="text-xs font-medium text-muted-foreground">
+              Your verification code (shown here for this preview):
+            </p>
+            <p className="mt-1 text-2xl font-bold tracking-[0.4em] text-foreground">
+              {generatedCode}
+            </p>
+          </div>
 
           <label className="mt-6 block text-sm font-medium text-foreground">
             Verification code
@@ -617,26 +388,20 @@ function GetStarted() {
           <div className="mt-6 flex flex-wrap gap-3">
             <button
               type="button"
-              disabled={
-                busy || code.replace(/\D/g, "").length !== 6
-              }
+              disabled={code.replace(/\D/g, "").length !== 6}
               onClick={verifyCode}
               className={primaryBtn}
             >
-              {busy ? "Checking…" : "Verify code"}
+              Verify code
             </button>
 
             <button
               type="button"
-              disabled={busy || resendIn > 0}
+              disabled={resendIn > 0}
               onClick={sendCode}
               className={ghostBtn}
             >
-              {busy
-                ? "Sending…"
-                : resendIn > 0
-                  ? `Resend in ${resendIn}s`
-                  : "Resend email"}
+              {resendIn > 0 ? `Resend in ${resendIn}s` : "Resend code"}
             </button>
 
             <button
@@ -750,16 +515,14 @@ function GetStarted() {
           <div className="mt-6 flex flex-wrap gap-3">
             <button
               type="button"
-              disabled={busy}
               onClick={() => saveDetails(true)}
               className={primaryBtn}
             >
-              {busy ? "Saving…" : "Finish with ID"}
+              Finish with ID
             </button>
 
             <button
               type="button"
-              disabled={busy}
               onClick={() => saveDetails(false)}
               className={ghostBtn}
             >
@@ -817,4 +580,3 @@ function GetStarted() {
     </div>
   );
 }
-
