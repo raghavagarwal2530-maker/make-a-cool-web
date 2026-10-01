@@ -90,6 +90,11 @@ function GetStarted() {
     }
     if (savedEmail) {
       setEmail(savedEmail);
+      const sentAt = Number(window.sessionStorage.getItem("workwave-onboarding-code-sent-at"));
+      if (sentAt > 0) {
+        setStep(2);
+        setResendIn(Math.max(0, Math.ceil((sentAt + 60_000 - Date.now()) / 1000)));
+      }
     }
 
     // Handle email link callbacks (in case the user clicks the link in the email
@@ -98,6 +103,7 @@ function GetStarted() {
     const advance = (userEmail?: string | null) => {
       if (!active) return;
       setError(null);
+      window.sessionStorage.removeItem("workwave-onboarding-code-sent-at");
       if (userEmail) setEmail((e) => e || userEmail);
       setStep((s) => (s < 3 ? 3 : s));
     };
@@ -174,12 +180,9 @@ function GetStarted() {
 
     const { error: err } = await supabase.auth.signInWithOtp({
       email: email.trim(),
-      options: {
-        shouldCreateUser: true,
-        ...(typeof window !== "undefined"
-          ? { emailRedirectTo: `${window.location.origin}/get-started` }
-          : {}),
-      },
+      // Supabase's hosted email templates must contain {{ .Token }}, not a login link.
+      // Code verification happens in this tab and needs no redirect URL.
+      options: { shouldCreateUser: true },
     });
 
     setBusy(false);
@@ -195,8 +198,10 @@ function GetStarted() {
     }
 
     window.sessionStorage.setItem("workwave-onboarding-email", email.trim());
+    window.sessionStorage.setItem("workwave-onboarding-code-sent-at", String(Date.now()));
     if (role) window.sessionStorage.setItem("workwave-onboarding-role", role);
 
+    setEmail(email.trim());
     setResendIn(60);
     setStep(2);
   }
@@ -396,7 +401,8 @@ function GetStarted() {
             Verification code
             <input
               value={code}
-              onChange={(e) => setCode(e.target.value)}
+              onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+              autoComplete="one-time-code"
               inputMode="numeric"
               placeholder="123456"
               maxLength={6}
@@ -415,7 +421,17 @@ function GetStarted() {
             <button type="button" disabled={busy || resendIn > 0} onClick={sendCode} className={ghostBtn}>
               {busy ? "Sending…" : resendIn > 0 ? `Resend in ${resendIn}s` : "Resend code"}
             </button>
-            <button type="button" onClick={() => setStep(1)} className={ghostBtn}>
+            <button
+              type="button"
+              disabled={busy}
+              onClick={() => {
+                window.sessionStorage.removeItem("workwave-onboarding-code-sent-at");
+                setCode("");
+                setError(null);
+                setStep(1);
+              }}
+              className={ghostBtn}
+            >
               Use a different email
             </button>
           </div>

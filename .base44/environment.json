@@ -2,5 +2,11 @@
   "previewPort": 3000,
   "healthPath": "/",
   "startCommand": "docker compose -f docker-compose.base44.yml up -d",
-  "secrets": []
+  "secrets": [
+    {
+      "name": "SUPABASE_ACCESS_TOKEN",
+      "description": "Supabase personal access token from https://supabase.com/dashboard/account/tokens, needed only to update the hosted authentication email templates to six-digit codes.",
+      "requiredAtBoot": false
+    }
+  ]
 }
