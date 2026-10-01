@@ -43,9 +43,9 @@ const RULES: HelpRule[] = [
       "To get started: click 'Get started' in the top right. Choose whether you want to post a gig or find work (or volunteer). Verify your email with the 6-digit code we send, add your phone number and date of birth, and optionally add an ID. That's it — you're ready to go!",
   },
   {
-    keywords: ["payment", "pay", "cost", "price", "free", "how much", "aed", "money"],
+    keywords: ["payment", "pay", "cost", "price", "free", "how much", "£", "pound", "money"],
     response:
-      "Finding work and joining volunteering communities is always free. Posting gigs is free too. Creating your first volunteering community is free — each additional community costs AED 50. Check our Pricing page for full details.",
+      "Finding work and joining volunteering communities is always free. Posting gigs is free too. Creating your first volunteering community is free — each additional community costs £10. Check our Pricing page for full details.",
   },
   {
     keywords: ["contact", "phone", "call", "message", "reach", "get in touch"],

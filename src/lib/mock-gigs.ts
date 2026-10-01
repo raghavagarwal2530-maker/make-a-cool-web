@@ -1,5 +1,5 @@
 // Mock gig data and proximity helpers for the "Find work" screen.
-// This is placeholder data — no real gigs are posted yet.
+// UK-based placeholder data — no real gigs are posted yet.
 
 export type GigType = "one-time" | "recurring" | "part-time";
 
@@ -17,176 +17,186 @@ export interface MockGig {
   phone: string;
 }
 
-// UAE areas with approximate coordinates (lat, lng).
+// UK areas with approximate coordinates (lat, lng).
 export const AREAS: { name: string; lat: number; lng: number }[] = [
-  { name: "Dubai Marina", lat: 25.0772, lng: 55.139 },
-  { name: "Downtown Dubai", lat: 25.1972, lng: 55.2744 },
-  { name: "Business Bay", lat: 25.185, lng: 55.242 },
-  { name: "JLT", lat: 25.0657, lng: 55.139 },
-  { name: "Deira", lat: 25.273, lng: 55.3373 },
-  { name: "Al Barsha", lat: 25.1185, lng: 55.209 },
-  { name: "Jumeirah", lat: 25.227, lng: 55.208 },
-  { name: "Silicon Oasis", lat: 25.13, lng: 55.2105 },
-  { name: "Sharjah", lat: 25.3463, lng: 55.4209 },
-  { name: "Abu Dhabi", lat: 24.4539, lng: 54.3773 },
+  { name: "Camden, London", lat: 51.529, lng: -0.1255 },
+  { name: "Shoreditch, London", lat: 51.525, lng: -0.075 },
+  { name: "Westminster, London", lat: 51.4975, lng: -0.1357 },
+  { name: "Greenwich, London", lat: 51.4826, lng: 0.0077 },
+  { name: "Brixton, London", lat: 51.461, lng: -0.115 },
+  { name: "Manchester", lat: 53.4808, lng: -2.2426 },
+  { name: "Birmingham", lat: 52.4862, lng: -1.8904 },
+  { name: "Leeds", lat: 53.8008, lng: -1.5491 },
+  { name: "Bristol", lat: 51.4545, lng: -2.5879 },
+  { name: "Liverpool", lat: 53.4084, lng: -2.9916 },
+  { name: "Sheffield", lat: 53.3811, lng: -1.4705 },
+  { name: "Edinburgh", lat: 55.9533, lng: -3.1883 },
+  { name: "Glasgow", lat: 55.8642, lng: -4.2518 },
+  { name: "Cardiff", lat: 51.4816, lng: -3.1791 },
+  { name: "Brighton", lat: 50.8225, lng: -0.1372 },
+  { name: "Newcastle", lat: 54.9783, lng: -1.6178 },
+  { name: "Oxford", lat: 51.752, lng: -1.2577 },
+  { name: "Cambridge", lat: 52.2053, lng: 0.1218 },
+  { name: "Bournemouth", lat: 50.7194, lng: -1.8809 },
+  { name: "Nottingham", lat: 52.954, lng: -1.1581 },
 ];
 
 export const MOCK_GIGS: MockGig[] = [
   {
     id: "g1",
-    title: "Movers needed for 1-bed apartment",
+    title: "Movers needed for 1-bed flat",
     company: "QuickShift Movers",
     type: "one-time",
-    pay: "AED 350 / gig",
-    area: "Dubai Marina",
-    lat: 25.0772,
-    lng: 55.139,
+    pay: "£120 / gig",
+    area: "Camden, London",
+    lat: 51.529,
+    lng: -0.1255,
     posted: "2h ago",
     duration: "3–4 hours",
-    phone: "+971 50 100 0001",
+    phone: "+44 7700 900001",
   },
   {
     id: "g2",
     title: "Barista for morning shifts",
     company: "Brew & Co Café",
     type: "recurring",
-    pay: "AED 45 / hour",
-    area: "Downtown Dubai",
-    lat: 25.1972,
-    lng: 55.2744,
+    pay: "£12 / hour",
+    area: "Shoreditch, London",
+    lat: 51.525,
+    lng: -0.075,
     posted: "5h ago",
     duration: "Mon–Fri, 6–10am",
-    phone: "+971 50 100 0002",
+    phone: "+44 7700 900002",
   },
   {
     id: "g3",
     title: "Weekend event setup crew",
-    company: "Eventify Dubai",
+    company: "Eventify London",
     type: "recurring",
-    pay: "AED 50 / hour",
-    area: "Business Bay",
-    lat: 25.185,
-    lng: 55.242,
+    pay: "£13 / hour",
+    area: "Westminster, London",
+    lat: 51.4975,
+    lng: -0.1357,
     posted: "1d ago",
     duration: "Every Sat, 8am–2pm",
-    phone: "+971 50 100 0003",
+    phone: "+44 7700 900003",
   },
   {
     id: "g4",
     title: "Delivery rider — own bike",
     company: "SwiftDeliver",
     type: "part-time",
-    pay: "AED 30 / hour + tips",
-    area: "JLT",
-    lat: 25.0657,
-    lng: 55.139,
+    pay: "£10 / hour + tips",
+    area: "Greenwich, London",
+    lat: 51.4826,
+    lng: 0.0077,
     posted: "3h ago",
     duration: "Evenings, 4–9pm",
-    phone: "+971 50 100 0004",
+    phone: "+44 7700 900004",
   },
   {
     id: "g5",
     title: "House painting — 2 rooms",
     company: "ColourPro Handyman",
     type: "one-time",
-    pay: "AED 600 / gig",
-    area: "Al Barsha",
-    lat: 25.1185,
-    lng: 55.209,
+    pay: "£200 / gig",
+    area: "Brixton, London",
+    lat: 51.461,
+    lng: -0.115,
     posted: "6h ago",
     duration: "1–2 days",
-    phone: "+971 50 100 0005",
+    phone: "+44 7700 900005",
   },
   {
     id: "g6",
     title: "Retail assistant — weekend",
     company: "Mart Plus",
     type: "recurring",
-    pay: "AED 40 / hour",
-    area: "Deira",
-    lat: 25.273,
-    lng: 55.3373,
+    pay: "£11 / hour",
+    area: "Manchester",
+    lat: 53.4808,
+    lng: -2.2426,
     posted: "8h ago",
     duration: "Fri–Sun, 12–8pm",
-    phone: "+971 50 100 0006",
+    phone: "+44 7700 900006",
   },
   {
     id: "g7",
-    title: "Tutor for Grade 10 maths",
+    title: "Tutor for GCSE maths",
     company: "Private family",
     type: "recurring",
-    pay: "AED 120 / session",
-    area: "Jumeirah",
-    lat: 25.227,
-    lng: 55.208,
+    pay: "£25 / session",
+    area: "Oxford",
+    lat: 51.752,
+    lng: -1.2577,
     posted: "1d ago",
     duration: "2x weekly, 1.5hr",
-    phone: "+971 50 100 0007",
+    phone: "+44 7700 900007",
   },
   {
     id: "g8",
     title: "Garden cleanup and hedge trim",
     company: "GreenScape",
     type: "one-time",
-    pay: "AED 250 / gig",
-    area: "Silicon Oasis",
-    lat: 25.13,
-    lng: 55.2105,
+    pay: "£80 / gig",
+    area: "Bristol",
+    lat: 51.4545,
+    lng: -2.5879,
     posted: "4h ago",
     duration: "Half day",
-    phone: "+971 50 100 0008",
+    phone: "+44 7700 900008",
   },
   {
     id: "g9",
     title: "Warehouse packer — evening shift",
     company: "BoxRight Logistics",
     type: "part-time",
-    pay: "AED 35 / hour",
-    area: "Sharjah",
-    lat: 25.3463,
-    lng: 55.4209,
+    pay: "£10 / hour",
+    area: "Birmingham",
+    lat: 52.4862,
+    lng: -1.8904,
     posted: "2d ago",
-    duration: "Sun–Thu, 6–10pm",
-    phone: "+971 50 100 0009",
+    duration: "Mon–Thu, 6–10pm",
+    phone: "+44 7700 900009",
   },
   {
     id: "g10",
     title: "Receptionist cover — 2 weeks",
     company: "BrightSmile Clinic",
     type: "part-time",
-    pay: "AED 50 / hour",
-    area: "Abu Dhabi",
-    lat: 24.4539,
-    lng: 54.3773,
+    pay: "£12 / hour",
+    area: "Leeds",
+    lat: 53.8008,
+    lng: -1.5491,
     posted: "12h ago",
     duration: "9am–3pm, weekdays",
-    phone: "+971 50 100 0010",
+    phone: "+44 7700 900010",
   },
   {
     id: "g11",
     title: "Furniture assembly (IKEA)",
     company: "BuildIt Handy",
     type: "one-time",
-    pay: "AED 200 / gig",
-    area: "Dubai Marina",
-    lat: 25.0772,
-    lng: 55.139,
+    pay: "£70 / gig",
+    area: "Brighton",
+    lat: 50.8225,
+    lng: -0.1372,
     posted: "7h ago",
     duration: "2–3 hours",
-    phone: "+971 50 100 0011",
+    phone: "+44 7700 900011",
   },
   {
     id: "g12",
     title: "Cleaner for small office",
     company: "Spotless Co.",
     type: "recurring",
-    pay: "AED 60 / hour",
-    area: "Business Bay",
-    lat: 25.185,
-    lng: 55.242,
+    pay: "£15 / hour",
+    area: "Liverpool",
+    lat: 53.4084,
+    lng: -2.9916,
     posted: "1d ago",
     duration: "3x weekly, 2hr",
-    phone: "+971 50 100 0012",
+    phone: "+44 7700 900012",
   },
 ];
 
@@ -206,8 +216,21 @@ export function distanceKm(
   return 2 * R * Math.asin(Math.sqrt(h));
 }
 
+// Try to match a free-text area to a known coordinate for distance sorting.
+function findAreaCoord(text: string) {
+  const lower = text.toLowerCase();
+  return (
+    AREAS.find((a) => a.name.toLowerCase() === lower) ||
+    AREAS.find((a) => {
+      const first = a.name.toLowerCase().split(",")[0] ?? "";
+      return lower.includes(first);
+    }) ||
+    AREAS.find((a) => a.name.toLowerCase().includes(lower))
+  );
+}
+
 export function gigsSortedByDistanceFrom(areaName: string): MockGig[] {
-  const origin = AREAS.find((a) => a.name === areaName);
+  const origin = findAreaCoord(areaName);
   if (!origin) return MOCK_GIGS;
   return [...MOCK_GIGS].sort(
     (a, b) => distanceKm(origin, a) - distanceKm(origin, b),
@@ -215,7 +238,14 @@ export function gigsSortedByDistanceFrom(areaName: string): MockGig[] {
 }
 
 export function gigDistance(areaName: string, gig: MockGig): number {
-  const origin = AREAS.find((a) => a.name === areaName);
+  const origin = findAreaCoord(areaName);
   if (!origin) return 0;
   return distanceKm(origin, gig);
+}
+
+// Filter gigs whose area matches the typed text (case-insensitive partial).
+export function gigsByAreaText(text: string): MockGig[] {
+  if (!text.trim()) return MOCK_GIGS;
+  const lower = text.toLowerCase();
+  return MOCK_GIGS.filter((g) => g.area.toLowerCase().includes(lower));
 }

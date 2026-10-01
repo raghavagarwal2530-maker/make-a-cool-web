@@ -50,7 +50,7 @@ function Volunteer() {
             Start a volunteering group, set what needs doing and invite people to help.
           </p>
           <p className="mt-4 text-sm font-semibold text-accent">
-            First community free · AED 50 for each one after
+            First community free · £10 for each one after
           </p>
           <p className="mt-2 text-xs text-muted-foreground">Creators must be 18 or older.</p>
         </Link>
@@ -63,6 +63,19 @@ function Volunteer() {
           <p className="mt-4 text-sm font-semibold text-accent">Always free</p>
           <p className="mt-2 text-xs text-muted-foreground">
             Any age can join — kids can use a parent's phone number.
+          </p>
+        </Link>
+      </div>
+
+      <div className="mt-8 grid gap-5 sm:grid-cols-2">
+        <Link to="/my-account" className={card}>
+          <h2 className="text-lg font-bold text-foreground">My Account</h2>
+          <p className="mt-2 text-sm text-muted-foreground">
+            See the communities you've created, jobs you've found and done, and
+            worker ratings.
+          </p>
+          <p className="mt-4 text-sm font-semibold text-accent">
+            View your dashboard →
           </p>
         </Link>
       </div>

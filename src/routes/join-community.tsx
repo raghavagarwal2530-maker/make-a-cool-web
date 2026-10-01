@@ -155,7 +155,7 @@ function JoinCommunity() {
                   type="tel"
                   value={joinPhone}
                   onChange={(e) => setJoinPhone(e.target.value)}
-                  placeholder="+971 50 123 4567"
+                  placeholder="+44 7700 900123"
                   maxLength={20}
                   className={input}
                 />

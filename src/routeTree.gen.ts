@@ -17,6 +17,7 @@ import { Route as GetStartedRouteImport } from './routes/get-started'
 import { Route as HelpRouteImport } from './routes/help'
 import { Route as HowItWorksRouteImport } from './routes/how-it-works'
 import { Route as JoinCommunityRouteImport } from './routes/join-community'
+import { Route as MyAccountRouteImport } from './routes/my-account'
 import { Route as PostAGigRouteImport } from './routes/post-a-gig'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as VolunteerRouteImport } from './routes/volunteer'
@@ -61,6 +62,11 @@ const JoinCommunityRoute = JoinCommunityRouteImport.update({
   path: '/join-community',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MyAccountRoute = MyAccountRouteImport.update({
+  id: '/my-account',
+  path: '/my-account',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PostAGigRoute = PostAGigRouteImport.update({
   id: '/post-a-gig',
   path: '/post-a-gig',
@@ -86,6 +92,7 @@ export interface FileRoutesByFullPath {
   '/help': typeof HelpRoute
   '/how-it-works': typeof HowItWorksRoute
   '/join-community': typeof JoinCommunityRoute
+  '/my-account': typeof MyAccountRoute
   '/post-a-gig': typeof PostAGigRoute
   '/pricing': typeof PricingRoute
   '/volunteer': typeof VolunteerRoute
@@ -99,6 +106,7 @@ export interface FileRoutesByTo {
   '/help': typeof HelpRoute
   '/how-it-works': typeof HowItWorksRoute
   '/join-community': typeof JoinCommunityRoute
+  '/my-account': typeof MyAccountRoute
   '/post-a-gig': typeof PostAGigRoute
   '/pricing': typeof PricingRoute
   '/volunteer': typeof VolunteerRoute
@@ -113,6 +121,7 @@ export interface FileRoutesById {
   '/help': typeof HelpRoute
   '/how-it-works': typeof HowItWorksRoute
   '/join-community': typeof JoinCommunityRoute
+  '/my-account': typeof MyAccountRoute
   '/post-a-gig': typeof PostAGigRoute
   '/pricing': typeof PricingRoute
   '/volunteer': typeof VolunteerRoute
@@ -128,6 +137,7 @@ export interface FileRouteTypes {
     | '/help'
     | '/how-it-works'
     | '/join-community'
+    | '/my-account'
     | '/post-a-gig'
     | '/pricing'
     | '/volunteer'
@@ -141,6 +151,7 @@ export interface FileRouteTypes {
     | '/help'
     | '/how-it-works'
     | '/join-community'
+    | '/my-account'
     | '/post-a-gig'
     | '/pricing'
     | '/volunteer'
@@ -154,6 +165,7 @@ export interface FileRouteTypes {
     | '/help'
     | '/how-it-works'
     | '/join-community'
+    | '/my-account'
     | '/post-a-gig'
     | '/pricing'
     | '/volunteer'
@@ -168,6 +180,7 @@ export interface RootRouteChildren {
   HelpRoute: typeof HelpRoute
   HowItWorksRoute: typeof HowItWorksRoute
   JoinCommunityRoute: typeof JoinCommunityRoute
+  MyAccountRoute: typeof MyAccountRoute
   PostAGigRoute: typeof PostAGigRoute
   PricingRoute: typeof PricingRoute
   VolunteerRoute: typeof VolunteerRoute
@@ -231,6 +244,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof JoinCommunityRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/my-account': {
+      id: '/my-account'
+      path: '/my-account'
+      fullPath: '/my-account'
+      preLoaderRoute: typeof MyAccountRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/post-a-gig': {
       id: '/post-a-gig'
       path: '/post-a-gig'
@@ -264,6 +284,7 @@ const rootRouteChildren: RootRouteChildren = {
   HelpRoute: HelpRoute,
   HowItWorksRoute: HowItWorksRoute,
   JoinCommunityRoute: JoinCommunityRoute,
+  MyAccountRoute: MyAccountRoute,
   PostAGigRoute: PostAGigRoute,
   PricingRoute: PricingRoute,
   VolunteerRoute: VolunteerRoute,

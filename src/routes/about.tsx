@@ -113,7 +113,7 @@ function About() {
         </p>
         <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground">
           Creating a community is the one part reserved for 18+, since a creator is responsible for
-          the people who show up. Your first community is free; each one after that is AED 50.
+          the people who show up. Your first community is free; each one after that is £10.
         </p>
         <Link
           to="/volunteer"

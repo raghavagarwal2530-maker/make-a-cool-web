@@ -1,5 +1,5 @@
 // Mock volunteering community data.
-// Placeholder — no real communities are persisted yet.
+// UK-based placeholder — no real communities are persisted yet.
 
 export interface Community {
   id: string;
@@ -27,17 +27,17 @@ export interface CommunityMember {
 export const MOCK_COMMUNITIES: Community[] = [
   {
     id: "c1",
-    name: "Dubai Beach Cleanup Crew",
+    name: "Brighton Beach Cleanup Crew",
     description:
-      "We meet every Friday morning to clean up Kite Beach. Gloves and bags provided. Great way to meet people and help the environment!",
-    location: "Kite Beach, Dubai",
-    timing: "Every Friday, 7:00 AM – 9:00 AM",
+      "We meet every Saturday morning to clean up Brighton Beach. Gloves and bags provided. Great way to meet people and help the environment!",
+    location: "Brighton Beach, East Sussex",
+    timing: "Every Saturday, 8:00 AM – 10:00 AM",
     category: "Environment",
     memberLimit: 30,
     autoAccept: true,
     members: [
-      { id: "m1", name: "Farah A.", phone: "+971 50 111 2222", joinedAt: "2d ago" },
-      { id: "m2", name: "Hassan M.", phone: "+971 50 333 4444", joinedAt: "1d ago" },
+      { id: "m1", name: "Farah A.", phone: "+44 7700 900111", joinedAt: "2d ago" },
+      { id: "m2", name: "Hassan M.", phone: "+44 7700 900222", joinedAt: "1d ago" },
     ],
     pendingMembers: [],
     creatorName: "Layla K.",
@@ -48,17 +48,17 @@ export const MOCK_COMMUNITIES: Community[] = [
     id: "c2",
     name: "Student Food Drive",
     description:
-      "University students collecting and distributing food to labor camps across Dubai. We need drivers and sorters. Join us every Saturday!",
-    location: "Deira, Dubai",
-    timing: "Every Saturday, 10:00 AM – 2:00 PM",
+      "University students collecting and distributing food to shelters across Leeds. We need drivers and sorters. Join us every Sunday!",
+    location: "Leeds City Centre",
+    timing: "Every Sunday, 10:00 AM – 2:00 PM",
     category: "Charity",
     memberLimit: 20,
     autoAccept: false,
     members: [
-      { id: "m3", name: "Omar S.", phone: "+971 50 555 6666", joinedAt: "3d ago" },
+      { id: "m3", name: "Omar S.", phone: "+44 7700 900333", joinedAt: "3d ago" },
     ],
     pendingMembers: [
-      { id: "p1", name: "Nora B.", phone: "+971 50 777 8888", joinedAt: "5h ago" },
+      { id: "p1", name: "Nora B.", phone: "+44 7700 900444", joinedAt: "5h ago" },
     ],
     creatorName: "Ahmed T.",
     creatorEmail: "ahmed@example.com",
@@ -68,16 +68,16 @@ export const MOCK_COMMUNITIES: Community[] = [
     id: "c3",
     name: "Free Tutoring for Kids",
     description:
-      "Volunteer tutors helping younger students with homework and exam prep. All subjects welcome. Sessions are held at the community center.",
-    location: "Al Barsha, Dubai",
+      "Volunteer tutors helping younger students with homework and exam prep. All subjects welcome. Sessions are held at the community centre.",
+    location: "Camden Community Centre, London",
     timing: "Sundays & Wednesdays, 4:00 PM – 6:00 PM",
     category: "Education",
     memberLimit: 15,
     autoAccept: true,
     members: [
-      { id: "m4", name: "Priya R.", phone: "+971 50 999 0000", joinedAt: "1w ago" },
-      { id: "m5", name: "Sara D.", phone: "+971 52 111 2222", joinedAt: "4d ago" },
-      { id: "m6", name: "Khalid A.", phone: "+971 52 333 4444", joinedAt: "2d ago" },
+      { id: "m4", name: "Priya R.", phone: "+44 7700 900555", joinedAt: "1w ago" },
+      { id: "m5", name: "Sara D.", phone: "+44 7700 900666", joinedAt: "4d ago" },
+      { id: "m6", name: "Khalid A.", phone: "+44 7700 900777", joinedAt: "2d ago" },
     ],
     pendingMembers: [],
     creatorName: "Mariam H.",
@@ -184,4 +184,18 @@ export function rejectPendingMember(communityId: string, memberId: string): bool
 
 export function isCommunityFull(community: Community): boolean {
   return community.members.length >= community.memberLimit;
+}
+
+// Get all communities created by a specific creator (by email).
+export function getCommunitiesByCreator(creatorEmail: string): Community[] {
+  return MOCK_COMMUNITIES.filter(
+    (c) => c.creatorEmail.toLowerCase() === creatorEmail.toLowerCase(),
+  );
+}
+
+// Count how many communities a creator has made.
+export function countCommunitiesByCreator(creatorEmail: string): number {
+  return MOCK_COMMUNITIES.filter(
+    (c) => c.creatorEmail.toLowerCase() === creatorEmail.toLowerCase(),
+  ).length;
 }

@@ -1,8 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import {
-  AREAS,
-  gigsSortedByDistanceFrom,
+  gigsByAreaText,
   gigDistance,
   type MockGig,
   type GigType,
@@ -75,8 +74,8 @@ function FindWork() {
   const [registered, setRegistered] = useState(false);
 
   const gigs = useMemo(() => {
-    if (!submitted || !area || !workType) return [];
-    return gigsSortedByDistanceFrom(area).filter((g) => g.type === workType);
+    if (!submitted || !workType) return [];
+    return gigsByAreaText(area).filter((g) => g.type === workType);
   }, [submitted, area, workType]);
 
   return (
@@ -102,19 +101,17 @@ function FindWork() {
 
         <label className="mt-6 block text-sm font-medium text-foreground">
           Which area do you want to find work in?
-          <select
+          <input
             value={area}
             onChange={(e) => setArea(e.target.value)}
+            placeholder="e.g. Camden, London or Manchester"
+            maxLength={200}
             className={input}
-          >
-            <option value="">Select your area…</option>
-            {AREAS.map((a) => (
-              <option key={a.name} value={a.name}>
-                {a.name}
-              </option>
-            ))}
-          </select>
+          />
         </label>
+        <p className="mt-1.5 text-xs text-muted-foreground">
+          Type a specific area, town, or city — anywhere in the UK.
+        </p>
 
         <label className="mt-5 block text-sm font-medium text-foreground">
           University{" "}
@@ -122,7 +119,7 @@ function FindWork() {
           <input
             value={uni}
             onChange={(e) => setUni(e.target.value)}
-            placeholder="e.g. University of Wollongong Dubai"
+            placeholder="e.g. UCL, King's College London"
             maxLength={120}
             className={input}
           />
@@ -187,7 +184,7 @@ function FindWork() {
             {gigs.length === 1 ? "" : "s"} near {area}
           </p>
           <p className="mt-2 text-xs text-muted-foreground">
-            Sorted by distance — closest first.
+            Matching your area — closest first.
           </p>
 
           {gigs.length === 0 ? (
@@ -309,7 +306,7 @@ function FindWork() {
               <input
                 value={regPhone}
                 onChange={(e) => setRegPhone(e.target.value)}
-                placeholder="e.g. +971 50 123 4567"
+                placeholder="e.g. +44 7700 900123"
                 maxLength={30}
                 className={input}
               />

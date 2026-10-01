@@ -7,13 +7,13 @@ export const Route = createFileRoute("/pricing")({
       {
         name: "description",
         content:
-          "Doers join for free. Requesters pay a 10% fee on small one-time gigs or AED 100 per month for recurring gigs. No hidden costs.",
+          "Doers join for free. Requesters pay a 10% fee on small one-time gigs or £25 per month for recurring gigs. No hidden costs.",
       },
       { property: "og:title", content: "WorkWave pricing" },
       {
         property: "og:description",
         content:
-          "Doers keep what they earn. Requesters pay 10% on small one-time gigs or AED 100/month for recurring gigs.",
+          "Doers keep what they earn. Requesters pay 10% on small one-time gigs or £25/month for recurring gigs.",
       },
     ],
   }),
@@ -28,7 +28,7 @@ const plans = [
     features: [
       "Post single tasks instantly",
       "The doer receives 10% less than the price the requester sets",
-      "Example: AED 200 gig → doer gets AED 180, WorkWave keeps AED 20",
+      "Example: £200 gig → doer gets £180, WorkWave keeps £20",
       "Only charged when the gig is completed",
     ],
     featured: false,
@@ -47,11 +47,11 @@ const plans = [
   },
   {
     name: "Part-time job (company)",
-    price: "AED 100",
+    price: "£25",
     note: "every 3 months, for one year",
     features: [
       "For real part-time roles posted by companies",
-      "AED 100 charged every 3 months for the first year",
+      "£25 charged every 3 months for the first year",
       "After one year we stop charging completely",
       "No percentage taken from the employee’s salary",
     ],
@@ -113,9 +113,9 @@ function Pricing() {
             The remaining <strong className="text-foreground">90% goes straight to the doer</strong>.
           </p>
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-            Example: a one-time gig pays <strong className="text-foreground">AED 200</strong>. The doer
-            receives <strong className="text-foreground">AED 180</strong> and WorkWave receives{" "}
-            <strong className="text-foreground">AED 20</strong>.
+            Example: a one-time gig pays <strong className="text-foreground">£200</strong>. The doer
+            receives <strong className="text-foreground">£180</strong> and WorkWave receives{" "}
+            <strong className="text-foreground">£20</strong>.
           </p>
         </div>
 
@@ -127,8 +127,8 @@ function Pricing() {
             running. The doer receives 90% of the agreed pay each time.
           </p>
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-            Example: a weekly cleaning shift at AED 500 pays the doer{" "}
-            <strong className="text-foreground">AED 450</strong> per shift.
+            Example: a weekly cleaning shift at £150 pays the doer{" "}
+            <strong className="text-foreground">£135</strong> per shift.
           </p>
         </div>
       </div>
@@ -143,7 +143,7 @@ function Pricing() {
         <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
           <strong className="text-foreground">Your first community is free</strong> as a trial. Every
           community you create after that costs{" "}
-          <strong className="text-foreground">AED 50</strong> each. Creating a community requires
+          <strong className="text-foreground">£10</strong> each. Creating a community requires
           being 18 or older.
         </p>
       </div>
@@ -153,7 +153,7 @@ function Pricing() {
         <h2 className="text-lg font-bold text-foreground">Part-time jobs & companies</h2>
         <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
           When a company hires for a real part-time role, we don’t touch the salary. Instead the
-          company pays <strong className="text-foreground">AED 100 every 3 months</strong> —{" "}
+          company pays <strong className="text-foreground">£25 every 3 months</strong> —{" "}
           <strong className="text-foreground">four payments over one year</strong>. After that year
           we stop charging for that role entirely.
         </p>

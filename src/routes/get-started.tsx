@@ -440,7 +440,7 @@ function GetStarted() {
                 type="tel"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                placeholder="+971 50 123 4567"
+                placeholder="+44 7700 900123"
                 maxLength={20}
                 className={input}
               />
@@ -476,7 +476,7 @@ function GetStarted() {
               ID type
               <select value={idType} onChange={(e) => setIdType(e.target.value)} className={input}>
                 <option value="">Select…</option>
-                <option value="emirates_id">Emirates ID</option>
+                <option value="national_insurance">National Insurance number</option>
                 <option value="passport">Passport</option>
                 <option value="driving_licence">Driving licence</option>
               </select>
@@ -486,7 +486,7 @@ function GetStarted() {
               <input
                 value={idNumber}
                 onChange={(e) => setIdNumber(e.target.value)}
-                placeholder="784-XXXX-XXXXXXX-X"
+                placeholder="e.g. AB123456C"
                 maxLength={40}
                 className={input}
               />

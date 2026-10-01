@@ -5,7 +5,7 @@ import {
   looksLikeSpam,
   type AiReconfirmResult,
 } from "@/lib/gig-ai";
-import { AREAS, type GigType } from "@/lib/mock-gigs";
+import { type GigType } from "@/lib/mock-gigs";
 import { workersMatching, type HireableWorker } from "@/lib/mock-workers";
 
 export const Route = createFileRoute("/post-a-gig")({
@@ -375,19 +375,17 @@ function PostAGig() {
           </p>
           <label className="mt-6 block text-sm font-medium text-foreground">
             Area
-            <select
+            <input
               value={area}
               onChange={(e) => setArea(e.target.value)}
+              placeholder="e.g. Camden, London or Brighton Beach"
+              maxLength={200}
               className={input}
-            >
-              <option value="">Select an area…</option>
-              {AREAS.map((a) => (
-                <option key={a.name} value={a.name}>
-                  {a.name}
-                </option>
-              ))}
-            </select>
+            />
           </label>
+          <p className="mt-1.5 text-xs text-muted-foreground">
+            Type a specific area, street, or venue — anywhere in the UK.
+          </p>
           <label className="mt-6 block text-sm font-medium text-foreground">
             Address / landmark (optional)
             <input
@@ -448,7 +446,7 @@ function PostAGig() {
             <input
               value={pay}
               onChange={(e) => setPay(e.target.value)}
-              placeholder="e.g. AED 350 / gig"
+              placeholder="e.g. £120 / gig"
               maxLength={100}
               className={input}
             />

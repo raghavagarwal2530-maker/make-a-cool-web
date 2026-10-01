@@ -1,7 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { AREAS } from "@/lib/mock-gigs";
-import { createCommunity } from "@/lib/mock-communities";
+import { createCommunity, countCommunitiesByCreator } from "@/lib/mock-communities";
 
 export const Route = createFileRoute("/create-community")({
   head: () => ({
@@ -55,7 +54,15 @@ function CreateCommunity() {
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState(false);
 
-  const total = 4;
+  // Bank details (required for 2nd+ community)
+  const [bankName, setBankName] = useState("");
+  const [bankSortCode, setBankSortCode] = useState("");
+  const [bankAccountNumber, setBankAccountNumber] = useState("");
+
+  const needsBankDetails = creatorEmail.trim()
+    ? countCommunitiesByCreator(creatorEmail) >= 1
+    : false;
+  const total = needsBankDetails ? 5 : 4;
 
   return (
     <div className="mx-auto max-w-2xl px-5 pb-20 pt-16">
@@ -139,7 +146,7 @@ function CreateCommunity() {
             <input
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. Dubai Beach Cleanup Crew"
+              placeholder="e.g. Brighton Beach Cleanup Crew"
               maxLength={100}
               className={input}
             />
@@ -211,13 +218,17 @@ function CreateCommunity() {
           </p>
           <label className="mt-6 block text-sm font-medium text-foreground">
             Location
-            <select value={location} onChange={(e) => setLocation(e.target.value)} className={input}>
-              <option value="">Select an area…</option>
-              {AREAS.map((a) => (
-                <option key={a.name} value={a.name}>{a.name}</option>
-              ))}
-            </select>
+            <input
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              placeholder="e.g. Brighton Beach, East Sussex"
+              maxLength={200}
+              className={input}
+            />
           </label>
+          <p className="mt-1.5 text-xs text-muted-foreground">
+            Type a specific area, beach, park, or venue — anywhere in the UK.
+          </p>
           <label className="mt-5 block text-sm font-medium text-foreground">
             Timing
             <input
@@ -244,8 +255,63 @@ function CreateCommunity() {
         </div>
       )}
 
-      {/* Step 4 — member limit & acceptance */}
-      {step === 3 && !done && (
+      {/* Step 4 — bank details (only for 2nd+ community) */}
+      {step === 3 && !done && needsBankDetails && (
+        <div className={`mt-8 ${card}`}>
+          <h2 className="text-xl font-bold text-foreground">Bank details</h2>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Your first community is free. Each additional community costs{" "}
+            <span className="font-semibold text-foreground">£10</span>. Enter your
+            UK bank details to continue.
+          </p>
+          <label className="mt-6 block text-sm font-medium text-foreground">
+            Account holder name
+            <input
+              value={bankName}
+              onChange={(e) => setBankName(e.target.value)}
+              placeholder="e.g. John Smith"
+              maxLength={120}
+              className={input}
+            />
+          </label>
+          <label className="mt-5 block text-sm font-medium text-foreground">
+            Sort code
+            <input
+              value={bankSortCode}
+              onChange={(e) => setBankSortCode(e.target.value)}
+              placeholder="e.g. 12-34-56"
+              maxLength={8}
+              className={input}
+            />
+          </label>
+          <label className="mt-5 block text-sm font-medium text-foreground">
+            Account number
+            <input
+              value={bankAccountNumber}
+              onChange={(e) => setBankAccountNumber(e.target.value)}
+              placeholder="e.g. 12345678"
+              maxLength={8}
+              className={input}
+            />
+          </label>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <button
+              type="button"
+              disabled={!bankName.trim() || bankSortCode.trim().length < 6 || bankAccountNumber.trim().length < 8}
+              onClick={() => setStep(4)}
+              className={primaryBtn}
+            >
+              Continue
+            </button>
+            <button type="button" onClick={() => setStep(2)} className={ghostBtn}>
+              Back
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Step 4 (or 5) — member limit & acceptance */}
+      {step === (needsBankDetails ? 4 : 3) && !done && (
         <div className={`mt-8 ${card}`}>
           <h2 className="text-xl font-bold text-foreground">Member limit & acceptance</h2>
           <p className="mt-2 text-sm text-muted-foreground">
@@ -318,7 +384,7 @@ function CreateCommunity() {
             >
               Create community
             </button>
-            <button type="button" onClick={() => setStep(2)} className={ghostBtn}>
+            <button type="button" onClick={() => setStep(needsBankDetails ? 3 : 2)} className={ghostBtn}>
               Back
             </button>
           </div>
