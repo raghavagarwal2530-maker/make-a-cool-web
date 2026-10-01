@@ -11,9 +11,12 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
+import { Route as CreateCommunityRouteImport } from './routes/create-community'
 import { Route as FindWorkRouteImport } from './routes/find-work'
 import { Route as GetStartedRouteImport } from './routes/get-started'
+import { Route as HelpRouteImport } from './routes/help'
 import { Route as HowItWorksRouteImport } from './routes/how-it-works'
+import { Route as JoinCommunityRouteImport } from './routes/join-community'
 import { Route as PostAGigRouteImport } from './routes/post-a-gig'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as VolunteerRouteImport } from './routes/volunteer'
@@ -28,6 +31,11 @@ const AboutRoute = AboutRouteImport.update({
   path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CreateCommunityRoute = CreateCommunityRouteImport.update({
+  id: '/create-community',
+  path: '/create-community',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const FindWorkRoute = FindWorkRouteImport.update({
   id: '/find-work',
   path: '/find-work',
@@ -38,9 +46,19 @@ const GetStartedRoute = GetStartedRouteImport.update({
   path: '/get-started',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HelpRoute = HelpRouteImport.update({
+  id: '/help',
+  path: '/help',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const HowItWorksRoute = HowItWorksRouteImport.update({
   id: '/how-it-works',
   path: '/how-it-works',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JoinCommunityRoute = JoinCommunityRouteImport.update({
+  id: '/join-community',
+  path: '/join-community',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PostAGigRoute = PostAGigRouteImport.update({
@@ -62,9 +80,12 @@ const VolunteerRoute = VolunteerRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/create-community': typeof CreateCommunityRoute
   '/find-work': typeof FindWorkRoute
   '/get-started': typeof GetStartedRoute
+  '/help': typeof HelpRoute
   '/how-it-works': typeof HowItWorksRoute
+  '/join-community': typeof JoinCommunityRoute
   '/post-a-gig': typeof PostAGigRoute
   '/pricing': typeof PricingRoute
   '/volunteer': typeof VolunteerRoute
@@ -72,9 +93,12 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/create-community': typeof CreateCommunityRoute
   '/find-work': typeof FindWorkRoute
   '/get-started': typeof GetStartedRoute
+  '/help': typeof HelpRoute
   '/how-it-works': typeof HowItWorksRoute
+  '/join-community': typeof JoinCommunityRoute
   '/post-a-gig': typeof PostAGigRoute
   '/pricing': typeof PricingRoute
   '/volunteer': typeof VolunteerRoute
@@ -83,9 +107,12 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/create-community': typeof CreateCommunityRoute
   '/find-work': typeof FindWorkRoute
   '/get-started': typeof GetStartedRoute
+  '/help': typeof HelpRoute
   '/how-it-works': typeof HowItWorksRoute
+  '/join-community': typeof JoinCommunityRoute
   '/post-a-gig': typeof PostAGigRoute
   '/pricing': typeof PricingRoute
   '/volunteer': typeof VolunteerRoute
@@ -95,9 +122,12 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
+    | '/create-community'
     | '/find-work'
     | '/get-started'
+    | '/help'
     | '/how-it-works'
+    | '/join-community'
     | '/post-a-gig'
     | '/pricing'
     | '/volunteer'
@@ -105,9 +135,12 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about'
+    | '/create-community'
     | '/find-work'
     | '/get-started'
+    | '/help'
     | '/how-it-works'
+    | '/join-community'
     | '/post-a-gig'
     | '/pricing'
     | '/volunteer'
@@ -115,9 +148,12 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/about'
+    | '/create-community'
     | '/find-work'
     | '/get-started'
+    | '/help'
     | '/how-it-works'
+    | '/join-community'
     | '/post-a-gig'
     | '/pricing'
     | '/volunteer'
@@ -126,9 +162,12 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  CreateCommunityRoute: typeof CreateCommunityRoute
   FindWorkRoute: typeof FindWorkRoute
   GetStartedRoute: typeof GetStartedRoute
+  HelpRoute: typeof HelpRoute
   HowItWorksRoute: typeof HowItWorksRoute
+  JoinCommunityRoute: typeof JoinCommunityRoute
   PostAGigRoute: typeof PostAGigRoute
   PricingRoute: typeof PricingRoute
   VolunteerRoute: typeof VolunteerRoute
@@ -150,6 +189,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/create-community': {
+      id: '/create-community'
+      path: '/create-community'
+      fullPath: '/create-community'
+      preLoaderRoute: typeof CreateCommunityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/find-work': {
       id: '/find-work'
       path: '/find-work'
@@ -164,11 +210,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GetStartedRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/help': {
+      id: '/help'
+      path: '/help'
+      fullPath: '/help'
+      preLoaderRoute: typeof HelpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/how-it-works': {
       id: '/how-it-works'
       path: '/how-it-works'
       fullPath: '/how-it-works'
       preLoaderRoute: typeof HowItWorksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/join-community': {
+      id: '/join-community'
+      path: '/join-community'
+      fullPath: '/join-community'
+      preLoaderRoute: typeof JoinCommunityRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/post-a-gig': {
@@ -198,9 +258,12 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  CreateCommunityRoute: CreateCommunityRoute,
   FindWorkRoute: FindWorkRoute,
   GetStartedRoute: GetStartedRoute,
+  HelpRoute: HelpRoute,
   HowItWorksRoute: HowItWorksRoute,
+  JoinCommunityRoute: JoinCommunityRoute,
   PostAGigRoute: PostAGigRoute,
   PricingRoute: PricingRoute,
   VolunteerRoute: VolunteerRoute,

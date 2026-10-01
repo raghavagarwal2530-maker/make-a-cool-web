@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/get-started")({
   validateSearch: (search: Record<string, unknown>): { role?: Role } => {
@@ -51,14 +52,9 @@ const ghostBtn =
 function age(birthdate: string) {
   const b = new Date(birthdate);
   const now = new Date();
-
   let a = now.getFullYear() - b.getFullYear();
   const m = now.getMonth() - b.getMonth();
-
-  if (m < 0 || (m === 0 && now.getDate() < b.getDate())) {
-    a--;
-  }
-
+  if (m < 0 || (m === 0 && now.getDate() < b.getDate())) a--;
   return a;
 }
 
@@ -72,25 +68,22 @@ function GetStarted() {
   const [birthdate, setBirthdate] = useState("");
   const [idType, setIdType] = useState("");
   const [idNumber, setIdNumber] = useState("");
+  const [busy, setBusy] = useState(false);
   const [resendIn, setResendIn] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [code, setCode] = useState("");
-  const [generatedCode, setGeneratedCode] = useState("");
 
   const total = 5;
 
-  // Restore role/email from a previous attempt (e.g. after a page refresh).
   useEffect(() => {
+    let active = true;
+
     if (directRole) {
       window.sessionStorage.setItem("workwave-onboarding-role", directRole);
     }
 
-    const savedRole = window.sessionStorage.getItem(
-      "workwave-onboarding-role",
-    );
-    const savedEmail = window.sessionStorage.getItem(
-      "workwave-onboarding-email",
-    );
+    const savedRole = window.sessionStorage.getItem("workwave-onboarding-role");
+    const savedEmail = window.sessionStorage.getItem("workwave-onboarding-email");
 
     if (savedRole && roles.includes(savedRole as Role)) {
       setRole(savedRole as Role);
@@ -98,37 +91,75 @@ function GetStarted() {
     if (savedEmail) {
       setEmail(savedEmail);
     }
+
+    // Handle email link callbacks (in case the user clicks the link in the email
+    // instead of entering the code — this may or may not work depending on the
+    // Supabase redirect URL configuration).
+    const advance = (userEmail?: string | null) => {
+      if (!active) return;
+      setError(null);
+      if (userEmail) setEmail((e) => e || userEmail);
+      setStep((s) => (s < 3 ? 3 : s));
+    };
+
+    const cleanUrl = () => {
+      const u = new URL(window.location.href);
+      ["token_hash", "type", "code", "error", "error_code", "error_description"].forEach(
+        (key) => u.searchParams.delete(key),
+      );
+      window.history.replaceState({}, "", u.pathname + u.search);
+    };
+
+    (async () => {
+      const url = new URL(window.location.href);
+      const hash = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+      const tokenHash = url.searchParams.get("token_hash");
+      const authCode = url.searchParams.get("code");
+      const accessToken = hash.get("access_token");
+      const refreshToken = hash.get("refresh_token");
+
+      try {
+        if (tokenHash) {
+          const { data, error: err } = await supabase.auth.verifyOtp({
+            token_hash: tokenHash,
+            type: "email",
+          });
+          if (!err) advance(data.user?.email);
+        } else if (authCode) {
+          const { data, error: err } =
+            await supabase.auth.exchangeCodeForSession(authCode);
+          if (!err) advance(data.user?.email);
+        } else if (accessToken && refreshToken) {
+          const { data, error: err } = await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken,
+          });
+          if (!err) advance(data.user?.email);
+          window.history.replaceState({}, "", window.location.pathname + window.location.search);
+        }
+      } finally {
+        if (tokenHash || authCode) cleanUrl();
+      }
+
+      const { data } = await supabase.auth.getSession();
+      if (data.session) advance(data.session.user.email);
+    })();
+
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session) advance(session.user.email);
+    });
+
+    return () => {
+      active = false;
+      sub.subscription.unsubscribe();
+    };
   }, [directRole]);
 
   useEffect(() => {
     if (resendIn <= 0) return;
-
-    const timer = window.setTimeout(
-      () => setResendIn((value) => value - 1),
-      1000,
-    );
-
+    const timer = window.setTimeout(() => setResendIn((v) => v - 1), 1000);
     return () => window.clearTimeout(timer);
   }, [resendIn]);
-
-  async function verifyCode() {
-    setError(null);
-
-    const token = code.replace(/\D/g, "");
-
-    if (token.length !== 6) {
-      setError("Enter the 6-digit code.");
-      return;
-    }
-
-    if (token !== generatedCode) {
-      setError("That code is wrong. Check the code shown above and try again.");
-      return;
-    }
-
-    setError(null);
-    setStep(3);
-  }
 
   async function sendCode() {
     setError(null);
@@ -139,26 +170,61 @@ function GetStarted() {
       return;
     }
 
-    // Generate a 6-digit verification code client-side.
-    // (In production this would be sent via email; in this preview
-    //  we show it on screen so the flow works without email delivery.)
-    const newCode = String(Math.floor(100000 + Math.random() * 900000));
-    setGeneratedCode(newCode);
+    setBusy(true);
 
-    window.sessionStorage.setItem(
-      "workwave-onboarding-email",
-      email.trim(),
-    );
+    const { error: err } = await supabase.auth.signInWithOtp({
+      email: email.trim(),
+      options: {
+        shouldCreateUser: true,
+        ...(typeof window !== "undefined"
+          ? { emailRedirectTo: `${window.location.origin}/get-started` }
+          : {}),
+      },
+    });
 
-    if (role) {
-      window.sessionStorage.setItem(
-        "workwave-onboarding-role",
-        role,
-      );
+    setBusy(false);
+
+    if (err) {
+      if (err.message.toLowerCase().includes("security purposes")) {
+        setResendIn(60);
+        setError("A verification email was already sent. Please wait a minute before trying again.");
+        return;
+      }
+      setError(err.message);
+      return;
     }
+
+    window.sessionStorage.setItem("workwave-onboarding-email", email.trim());
+    if (role) window.sessionStorage.setItem("workwave-onboarding-role", role);
 
     setResendIn(60);
     setStep(2);
+  }
+
+  async function verifyCode() {
+    setError(null);
+    const token = code.replace(/\D/g, "");
+    if (token.length !== 6) {
+      setError("Enter the 6-digit code from your email.");
+      return;
+    }
+
+    setBusy(true);
+    const { data, error: err } = await supabase.auth.verifyOtp({
+      email: email.trim(),
+      token,
+      type: "email",
+    });
+    setBusy(false);
+
+    if (err) {
+      setError("That code is wrong or has expired. Send a new email and try again.");
+      return;
+    }
+
+    setError(null);
+    if (data.user?.email) setEmail((e) => e || data.user?.email || "");
+    setStep(3);
   }
 
   async function saveDetails(withId: boolean) {
@@ -168,12 +234,10 @@ function GetStarted() {
       setError("Add a phone number we can reach you on.");
       return;
     }
-
     if (!birthdate) {
       setError("Add your date of birth.");
       return;
     }
-
     if (role !== "volunteer" && age(birthdate) < 18) {
       setError(
         role === "community"
@@ -183,10 +247,20 @@ function GetStarted() {
       return;
     }
 
-    // Store profile locally (mock — no backend session in preview).
-    window.sessionStorage.setItem(
-      "workwave-onboarding-profile",
-      JSON.stringify({
+    setBusy(true);
+    const { data: userData } = await supabase.auth.getUser();
+    const userId = userData.user?.id;
+
+    if (!userId) {
+      setBusy(false);
+      setError("Your session expired. Please verify your email again.");
+      setStep(1);
+      return;
+    }
+
+    const { error: err } = await supabase.from("onboarding_profiles").upsert(
+      {
+        user_id: userId,
         role: role ?? "doer",
         email: email.trim(),
         phone: phone.trim(),
@@ -194,8 +268,16 @@ function GetStarted() {
         id_document_type: withId && idType ? idType : null,
         id_document_number: withId && idNumber ? idNumber.trim() : null,
         age_confirmed: true,
-      }),
+      },
+      { onConflict: "user_id" },
     );
+
+    setBusy(false);
+
+    if (err) {
+      setError(err.message);
+      return;
+    }
 
     setStep(5);
   }
@@ -214,16 +296,11 @@ function GetStarted() {
       </h1>
 
       {step < total && (
-        <div
-          className="mt-6 flex gap-2"
-          aria-label={`Step ${step + 1} of ${total}`}
-        >
+        <div className="mt-6 flex gap-2" aria-label={`Step ${step + 1} of ${total}`}>
           {Array.from({ length: total }).map((_, i) => (
             <span
               key={i}
-              className={`h-1.5 flex-1 rounded-full ${
-                i <= step ? "bg-primary" : "bg-border"
-              }`}
+              className={`h-1.5 flex-1 rounded-full ${i <= step ? "bg-primary" : "bg-border"}`}
             />
           ))}
         </div>
@@ -241,62 +318,35 @@ function GetStarted() {
           <h2 className="text-xl font-bold text-foreground">
             Would you like to post a gig, find work or volunteer?
           </h2>
-
           <p className="mt-2 text-sm text-muted-foreground">
-            You can switch later — this just sets up the right home screen
-            for you.
+            You can switch later — this just sets up the right home screen for you.
           </p>
-
           <Link
             to="/volunteer"
             className="mt-4 inline-flex text-sm font-semibold text-accent underline-offset-4 hover:underline"
           >
             I'd like to volunteer instead →
           </Link>
-
           <div className="mt-6 grid gap-4 sm:grid-cols-2">
             {[
-              {
-                key: "requester" as Role,
-                title: "Post a gig",
-                body:
-                  "I need someone for a one-time gig, a recurring shift or a part-time role.",
-              },
-              {
-                key: "doer" as Role,
-                title: "Find work",
-                body:
-                  "I want to browse gigs and shifts near me and pick what fits my schedule.",
-              },
+              { key: "requester" as Role, title: "Post a gig", body: "I need someone for a one-time gig, a recurring shift or a part-time role." },
+              { key: "doer" as Role, title: "Find work", body: "I want to browse gigs and shifts near me and pick what fits my schedule." },
             ].map((o) => (
               <button
                 key={o.key}
                 type="button"
                 onClick={() => setRole(o.key)}
                 className={`rounded-xl border p-5 text-left transition-colors ${
-                  role === o.key
-                    ? "border-primary bg-primary/10"
-                    : "border-border bg-background/50 hover:border-primary/60"
+                  role === o.key ? "border-primary bg-primary/10" : "border-border bg-background/50 hover:border-primary/60"
                 }`}
               >
-                <span className="block text-base font-semibold text-foreground">
-                  {o.title}
-                </span>
-
-                <span className="mt-2 block text-sm text-muted-foreground">
-                  {o.body}
-                </span>
+                <span className="block text-base font-semibold text-foreground">{o.title}</span>
+                <span className="mt-2 block text-sm text-muted-foreground">{o.body}</span>
               </button>
             ))}
           </div>
-
           <div className="mt-6">
-            <button
-              type="button"
-              disabled={!role}
-              onClick={() => setStep(1)}
-              className={primaryBtn}
-            >
+            <button type="button" disabled={!role} onClick={() => setStep(1)} className={primaryBtn}>
               Continue
             </button>
           </div>
@@ -306,18 +356,13 @@ function GetStarted() {
       {/* Step 2 — email */}
       {step === 1 && (
         <div className={`mt-8 ${card}`}>
-          <h2 className="text-xl font-bold text-foreground">
-            Verify your email
-          </h2>
-
+          <h2 className="text-xl font-bold text-foreground">Verify your email</h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            We'll send a 6-digit verification code to your email. Enter it
-            on the next step to continue.
+            We'll send a 6-digit verification code to your email. Open the message and
+            enter the code on the next step to continue.
           </p>
-
           <label className="mt-6 block text-sm font-medium text-foreground">
             Email address
-
             <input
               type="email"
               value={email}
@@ -327,21 +372,11 @@ function GetStarted() {
               className={input}
             />
           </label>
-
           <div className="mt-6 flex flex-wrap gap-3">
-            <button
-              type="button"
-              onClick={sendCode}
-              className={primaryBtn}
-            >
-              Send verification code
+            <button type="button" disabled={busy} onClick={sendCode} className={primaryBtn}>
+              {busy ? "Sending…" : "Send verification code"}
             </button>
-
-            <button
-              type="button"
-              onClick={() => setStep(0)}
-              className={ghostBtn}
-            >
+            <button type="button" onClick={() => setStep(0)} className={ghostBtn}>
               Back
             </button>
           </div>
@@ -351,30 +386,14 @@ function GetStarted() {
       {/* Step 3 — verification code */}
       {step === 2 && (
         <div className={`mt-8 ${card}`}>
-          <h2 className="text-xl font-bold text-foreground">
-            Enter your verification code
-          </h2>
-
+          <h2 className="text-xl font-bold text-foreground">Enter your verification code</h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            We sent a 6-digit code to{" "}
-            <span className="font-semibold text-foreground">{email}</span>.
-            Enter it below to continue.
+            A 6-digit code was sent to{" "}
+            <span className="font-semibold text-foreground">{email}</span>. Check your
+            inbox (and spam folder just in case) and enter the code below.
           </p>
-
-          {/* Preview-only: show the code on screen since email delivery
-              isn't available in this environment. */}
-          <div className="mt-4 rounded-xl border border-accent/40 bg-accent/10 px-4 py-3">
-            <p className="text-xs font-medium text-muted-foreground">
-              Your verification code (shown here for this preview):
-            </p>
-            <p className="mt-1 text-2xl font-bold tracking-[0.4em] text-foreground">
-              {generatedCode}
-            </p>
-          </div>
-
           <label className="mt-6 block text-sm font-medium text-foreground">
             Verification code
-
             <input
               value={code}
               onChange={(e) => setCode(e.target.value)}
@@ -384,31 +403,19 @@ function GetStarted() {
               className={input}
             />
           </label>
-
           <div className="mt-6 flex flex-wrap gap-3">
             <button
               type="button"
-              disabled={code.replace(/\D/g, "").length !== 6}
+              disabled={busy || code.replace(/\D/g, "").length !== 6}
               onClick={verifyCode}
               className={primaryBtn}
             >
-              Verify code
+              {busy ? "Checking…" : "Verify code"}
             </button>
-
-            <button
-              type="button"
-              disabled={resendIn > 0}
-              onClick={sendCode}
-              className={ghostBtn}
-            >
-              {resendIn > 0 ? `Resend in ${resendIn}s` : "Resend code"}
+            <button type="button" disabled={busy || resendIn > 0} onClick={sendCode} className={ghostBtn}>
+              {busy ? "Sending…" : resendIn > 0 ? `Resend in ${resendIn}s` : "Resend code"}
             </button>
-
-            <button
-              type="button"
-              onClick={() => setStep(1)}
-              className={ghostBtn}
-            >
+            <button type="button" onClick={() => setStep(1)} className={ghostBtn}>
               Use a different email
             </button>
           </div>
@@ -418,10 +425,7 @@ function GetStarted() {
       {/* Step 4 — phone + birthdate */}
       {step === 3 && (
         <div className={`mt-8 ${card}`}>
-          <h2 className="text-xl font-bold text-foreground">
-            Phone number and date of birth
-          </h2>
-
+          <h2 className="text-xl font-bold text-foreground">Phone number and date of birth</h2>
           <p className="mt-2 text-sm text-muted-foreground">
             {role === "volunteer"
               ? "Volunteers of any age are welcome. If you're under 18, add a parent or guardian's phone number so we can reach someone."
@@ -429,11 +433,9 @@ function GetStarted() {
                 ? "Your phone is required so members know who runs the community. Community creators must be 18 or older."
                 : "Your phone is required so both sides know who they're dealing with. You must be 18 or older to work on WorkWave."}
           </p>
-
           <div className="mt-6 grid gap-5 sm:grid-cols-2">
             <label className="block text-sm font-medium text-foreground">
               Phone number
-
               <input
                 type="tel"
                 value={phone}
@@ -443,10 +445,8 @@ function GetStarted() {
                 className={input}
               />
             </label>
-
             <label className="block text-sm font-medium text-foreground">
               Date of birth
-
               <input
                 type="date"
                 value={birthdate}
@@ -455,13 +455,8 @@ function GetStarted() {
               />
             </label>
           </div>
-
           <div className="mt-6 flex flex-wrap gap-3">
-            <button
-              type="button"
-              onClick={() => setStep(4)}
-              className={primaryBtn}
-            >
+            <button type="button" onClick={() => setStep(4)} className={primaryBtn}>
               Continue
             </button>
           </div>
@@ -471,37 +466,23 @@ function GetStarted() {
       {/* Step 5 — optional ID */}
       {step === 4 && (
         <div className={`mt-8 ${card}`}>
-          <h2 className="text-xl font-bold text-foreground">
-            Add an ID (optional)
-          </h2>
-
+          <h2 className="text-xl font-bold text-foreground">Add an ID (optional)</h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            If you're willing, add an ID to confirm your age. Verified
-            profiles get picked for gigs more often — but you can skip this
-            and finish now.
+            If you're willing, add an ID to confirm your age. Verified profiles get picked
+            for gigs more often — but you can skip this and finish now.
           </p>
-
           <div className="mt-6 grid gap-5 sm:grid-cols-2">
             <label className="block text-sm font-medium text-foreground">
               ID type
-
-              <select
-                value={idType}
-                onChange={(e) => setIdType(e.target.value)}
-                className={input}
-              >
+              <select value={idType} onChange={(e) => setIdType(e.target.value)} className={input}>
                 <option value="">Select…</option>
                 <option value="emirates_id">Emirates ID</option>
                 <option value="passport">Passport</option>
-                <option value="driving_licence">
-                  Driving licence
-                </option>
+                <option value="driving_licence">Driving licence</option>
               </select>
             </label>
-
             <label className="block text-sm font-medium text-foreground">
               ID number
-
               <input
                 value={idNumber}
                 onChange={(e) => setIdNumber(e.target.value)}
@@ -511,21 +492,11 @@ function GetStarted() {
               />
             </label>
           </div>
-
           <div className="mt-6 flex flex-wrap gap-3">
-            <button
-              type="button"
-              onClick={() => saveDetails(true)}
-              className={primaryBtn}
-            >
-              Finish with ID
+            <button type="button" disabled={busy} onClick={() => saveDetails(true)} className={primaryBtn}>
+              {busy ? "Saving…" : "Finish with ID"}
             </button>
-
-            <button
-              type="button"
-              onClick={() => saveDetails(false)}
-              className={ghostBtn}
-            >
+            <button type="button" disabled={busy} onClick={() => saveDetails(false)} className={ghostBtn}>
               Skip for now
             </button>
           </div>
@@ -535,10 +506,7 @@ function GetStarted() {
       {/* Done */}
       {step === 5 && (
         <div className={`mt-8 ${card}`}>
-          <h2 className="text-xl font-bold text-foreground">
-            You're verified 🎉
-          </h2>
-
+          <h2 className="text-xl font-bold text-foreground">You're verified 🎉</h2>
           <p className="mt-2 text-sm text-muted-foreground">
             Email confirmed and phone saved. You're set up to{" "}
             {role === "requester"
@@ -550,7 +518,6 @@ function GetStarted() {
                   : "find work"}{" "}
             on WorkWave.
           </p>
-
           <div className="mt-6 flex flex-wrap gap-3">
             {role === "requester" ? (
               <Link to="/post-a-gig" className={primaryBtn}>
@@ -561,11 +528,9 @@ function GetStarted() {
                 Start finding work
               </Link>
             )}
-
             <Link to="/how-it-works" className={ghostBtn}>
               See how it works
             </Link>
-
             <Link to="/" className={ghostBtn}>
               Back home
             </Link>
@@ -574,8 +539,8 @@ function GetStarted() {
       )}
 
       <p className="mt-8 text-xs text-muted-foreground">
-        Everyone on WorkWave is 18+ and phone verified. We only use your
-        details to match you with gigs.
+        Everyone on WorkWave is 18+ and phone verified. We only use your details to match
+        you with gigs.
       </p>
     </div>
   );

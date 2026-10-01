@@ -44,7 +44,7 @@ function Volunteer() {
       </p>
 
       <div className="mt-8 grid gap-5 sm:grid-cols-2">
-        <Link to="/get-started" search={{ role: "community" }} className={card}>
+        <Link to="/create-community" className={card}>
           <h2 className="text-lg font-bold text-foreground">Create a community</h2>
           <p className="mt-2 text-sm text-muted-foreground">
             Start a volunteering group, set what needs doing and invite people to help.
@@ -55,7 +55,7 @@ function Volunteer() {
           <p className="mt-2 text-xs text-muted-foreground">Creators must be 18 or older.</p>
         </Link>
 
-        <Link to="/get-started" search={{ role: "volunteer" }} className={card}>
+        <Link to="/join-community" className={card}>
           <h2 className="text-lg font-bold text-foreground">Join a community</h2>
           <p className="mt-2 text-sm text-muted-foreground">
             Find a cause near you and give a few hours whenever it suits you.
